@@ -39,3 +39,13 @@ _*.txt
 /scripts/bench/corpora/contracts/edgar/
 /scripts/bench/corpora/contracts/cuad/
 /scripts/bench/corpora/contracts/lease-kb-*.json
+
+# KEE local switch backup
+.kee-switch-overlay/
+
+# local KEE artifacts
+kee-data.tgz
+kee.dump
+kee-v1.0.0/
+输出 ppt/
+.DS_Store

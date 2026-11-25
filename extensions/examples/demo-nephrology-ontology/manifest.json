@@ -1,0 +1,18 @@
+{
+  "apiVersion": "kee.dev/v1alpha1",
+  "kind": "OntologyPack",
+  "metadata": {
+    "id": "demo-nephrology-ontology",
+    "version": "0.1.0",
+    "name": "Demo Nephrology Ontology",
+    "summary": "Synthetic nephrology demo ontology (not ICD/SNOMED; not for clinical use)",
+    "publisher": "kee-demo"
+  },
+  "spec": {
+    "ontologyFile": "ontology.ttl",
+    "format": "turtle",
+    "license": "CC0-1.0",
+    "classes": 3,
+    "properties": 2
+  }
+}
