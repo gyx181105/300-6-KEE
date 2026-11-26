@@ -15,7 +15,7 @@ export type Lang = (typeof LANGS)[number];
 export const LANG_NAMES: Record<Lang, string> = { en: "English", zh: "中文" };
 
 const BUNDLES: Record<Lang, Strings> = { en, zh };
-const KEY = "utopia.lang";
+const KEY = "kee.lang";
 
 function detect(): Lang {
   try {

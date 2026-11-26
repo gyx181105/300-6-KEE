@@ -24,7 +24,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "edgar"
-UA = os.environ.get("SEC_USER_AGENT", "Utopia-bench (bench@example.com)")
+UA = os.environ.get("SEC_USER_AGENT", "KEE-bench (bench@example.com)")
 
 
 def url_of(doc):

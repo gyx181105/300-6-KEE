@@ -14,7 +14,7 @@ node scripts/bench/run.mjs --corpus pharma --label seeds-only
 node scripts/bench/run.mjs --corpus pharma --ontology /tmp/schemaorg.ttl --label schemaorg
 ```
 
-前置：`utopia-server` 已启动、连着一个能写的库、工作区配好了对话与嵌入模型。
+前置：`kee-server` 已启动、连着一个能写的库、工作区配好了对话与嵌入模型。
 环境变量见 `run.mjs` 头部。
 
 ## 目录
@@ -69,13 +69,13 @@ node scripts/bench/judge_open.mjs --kb <id> --sample 200     # 开放陈述有�
 ```
 
 量「后面的分块看不到前面的分块认下了什么」对输出的影响（#588，分块并发调模型之前要知道的数）：
-服务端带 `UTOPIA_EXTRACT_KNOWN_IN_PROMPT=false` 起，照常跑 `recall.mjs`，与不带时的几轮比。
+服务端带 `KEE_EXTRACT_KNOWN_IN_PROMPT=false` 起，照常跑 `recall.mjs`，与不带时的几轮比。
 这个开关只动提示词，落库时按名字认回前面分块的实体照旧。
 
 ```
 # 服务端照常起：每轮记一份
 node scripts/bench/recall.mjs --kb <id> --known shown --out runs/588
-# 服务端带 UTOPIA_EXTRACT_KNOWN_IN_PROMPT=false 重起：同样几轮
+# 服务端带 KEE_EXTRACT_KNOWN_IN_PROMPT=false 重起：同样几轮
 node scripts/bench/recall.mjs --kb <id> --known empty --out runs/588
 # 按 known 分组排表
 node scripts/bench/recall.mjs --table runs/588
@@ -258,7 +258,7 @@ SQL 的空字段（psql 默认显示的 NULL、空字符串）与纯空白不参
 
 ```bash
 node --test scripts/bench/lib.test.mjs
-BENCH_TEST_PSQL="psql -X -h 127.0.0.1 -p 1517 -U utopia -tAc" BENCH_TEST_DB=utopia PGPASSWORD=utopia \
+BENCH_TEST_PSQL="psql -X -h 127.0.0.1 -p 1517 -U kee -tAc" BENCH_TEST_DB=kee PGPASSWORD=kee \
   node --test scripts/bench/lib.pg.test.mjs
 ```
 
@@ -268,7 +268,7 @@ BENCH_TEST_PSQL="psql -X -h 127.0.0.1 -p 1517 -U utopia -tAc" BENCH_TEST_DB=utop
 不另造引擎），判答没答上，把结果写回问题（`last_result`），再读服务端算的两个数：
 
 ```
-BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d utopia_bench4 -tAc" \
+BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d kee_bench4 -tAc" \
 BENCH_JUDGE_BASE=... BENCH_JUDGE_KEY=... BENCH_JUDGE_MODEL=... \
 node scripts/bench/competency.mjs --kb <kb-id> --seed scripts/bench/truth/redocred-typed.questions.json
 ```
@@ -292,9 +292,9 @@ node scripts/bench/competency.mjs --kb <kb-id> --seed scripts/bench/truth/redocr
 `POST /ontology/propose` 的 `glossary: full` 是给全词表那一臂用的旋钮，产品路径不开。
 
 ```
-BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d utopia_bench4 -tAc" \
+BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d kee_bench4 -tAc" \
 BENCH_SERVER_LOG=/path/to/server.log BENCH_JUDGE_BASE=... BENCH_JUDGE_KEY=... BENCH_JUDGE_MODEL=... \
-node scripts/bench/agent.mjs --kb <kb-id> --db utopia_bench4 --reset --arms trimmed,full,trimmed,full
+node scripts/bench/agent.mjs --kb <kb-id> --db kee_bench4 --reset --arms trimmed,full,trimmed,full
 ```
 
 **2026-09-27，bench4（100 篇 Re-DocRED，98 条属性），gemini-3.5-flash，每轮 120 条形状 + 69 个类别词、12 次调用：**
@@ -327,8 +327,8 @@ node scripts/bench/agent.mjs --kb <kb-id> --db utopia_bench4 --reset --arms trim
 新库，不删任何东西。
 
 ```
-BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d utopia_bench4 -tAc" \
-BENCH_SERVER_LOG=/path/to/server.log node scripts/bench/timewords.mjs --db utopia_bench4 --runs 3
+BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d kee_bench4 -tAc" \
+BENCH_SERVER_LOG=/path/to/server.log node scripts/bench/timewords.mjs --db kee_bench4 --runs 3
 ```
 
 句子按种类分：`absolute`（写明的日期）、`relative_now`（相对文本说话的那一刻：三个月后、上周、today）、

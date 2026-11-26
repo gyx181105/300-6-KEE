@@ -105,6 +105,6 @@ process.stdout.write(
 // 统计走 stderr，这样 stdout 可以直接重定向成语料文件
 console.error(
   `${docs.length} 张快照，${Math.round(chars / 1000)}k 字符，` +
-    // 1200 字符预算、150 重叠，见 utopia-ingest 的 chunk_text
+    // 1200 字符预算、150 重叠，见 kee-ingest 的 chunk_text
     `约 ${Math.round(chars / 1050)} 块`,
 );

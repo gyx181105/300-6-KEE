@@ -13,18 +13,18 @@
 # 所以这里不写 exit，也不动 shell 选项（`set -u` 同样会改到 entrypoint）。
 set -e
 
-if [ -z "${UTOPIA_APP_DB_PASSWORD:-}" ]; then
-    echo "未设置 UTOPIA_APP_DB_PASSWORD，跳过受限角色创建；应用将以 owner 身份运行。" >&2
+if [ -z "${KEE_APP_DB_PASSWORD:-}" ]; then
+    echo "未设置 KEE_APP_DB_PASSWORD，跳过受限角色创建；应用将以 owner 身份运行。" >&2
 else
     psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<SQL
 DO \$\$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'utopia_app') THEN
-        CREATE ROLE utopia_app LOGIN PASSWORD '${UTOPIA_APP_DB_PASSWORD}';
-        RAISE NOTICE '已创建受限角色 utopia_app';
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'kee_app') THEN
+        CREATE ROLE kee_app LOGIN PASSWORD '${KEE_APP_DB_PASSWORD}';
+        RAISE NOTICE '已创建受限角色 kee_app';
     END IF;
 END
 \$\$;
-GRANT CONNECT ON DATABASE "$POSTGRES_DB" TO utopia_app;
+GRANT CONNECT ON DATABASE "$POSTGRES_DB" TO kee_app;
 SQL
 fi

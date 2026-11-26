@@ -28,7 +28,7 @@ export function AccountShell() {
   const adminTab = (loc.search as { tab?: string }).tab ?? "models";
   const me = useQuery({ queryKey: ["me"], queryFn: fetchMe });
   const health = useQuery({ queryKey: ["health"], queryFn: api.health });
-  // 标题：`Utopia | Persona`——账户区整体一个名字，不逐页细分
+  // 标题：`KEE | Persona`——账户区整体一个名字，不逐页细分
   usePageTitle(S.app.name, S.account.titleTag);
 
   if (me.isPending) {

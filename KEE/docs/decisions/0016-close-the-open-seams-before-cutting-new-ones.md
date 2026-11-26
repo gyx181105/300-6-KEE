@@ -63,7 +63,7 @@ synonym-merging LLM call review narrative verbs, reversibly. C5 "N new phrasings
 time" from `ontology_misses` where `dismissed_at IS NULL`.
 
 **D · Semantic layer and data questions**, after C1. D1 `concept_mappings` gains `evidence`
-(the schema-doc chunk ids read during probing). D2 a "Utopia semantic layer" pack with IRIs,
+(the schema-doc chunk ids read during probing). D2 a "KEE semantic layer" pack with IRIs,
 optional and replaceable; `mappings.rs` finds types by IRI. D3 one mounted source → only its
 mappings, several → all, in `mappings::confirmed`. D4 the MySQL wire protocol (TiDB /
 OceanBase / Doris / StarRocks, `sqlparser` dialect switch); the lakehouse engines came first.
@@ -94,7 +94,7 @@ implements or overturns and whether the status line moved. Written into the [REA
   "a client you do not control renders your agent's UI"; on the Chat page both ends are ours,
   on the MCP side the counterpart is MCP's own UI extension. Decide when an external client
   needs the A1 card.
-- Whether to split extraction (about 6,500 lines) out of `utopia-server`. Decided not to
+- Whether to split extraction (about 6,500 lines) out of `kee-server`. Decided not to
   (2026-09-02): the only real gain is testing pure functions without the server, which their
   unit tests already do. Split when something cannot be tested without the server; the
   connector boundary waits for Feishu.

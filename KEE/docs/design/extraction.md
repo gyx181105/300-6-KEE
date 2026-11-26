@@ -14,7 +14,7 @@ chunk text. No ontology, no document date, no request for dates [0044 d2, #731].
 whole context: what its boundary cut away cannot be recovered by the prompt, so the chunker's rules
 are extraction's rules [0039].
 
-**Output, the compact contract** (`utopia_extract::open`). `e`: things, each a name or a
+**Output, the compact contract** (`kee_extract::open`). `e`: things, each a name or a
 description, the document's kind word, and whether it is named or described. `s`: statements, each
 opening with its own verbatim quote and then naming its subject and object in words, the relation
 phrase as written, an object name or a literal value, qualifiers keyed by the document's role

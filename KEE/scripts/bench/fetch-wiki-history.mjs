@@ -36,7 +36,7 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 
-const UA = "Utopia-bench/0.1 (+https://utopia.bi; corpus builder)";
+const UA = "KEE-bench/0.1 (+https://kee.bi; corpus builder)";
 const DRY = process.argv.includes("--dry");
 const WRITE_MANIFEST = process.argv.includes("--manifest");
 const FROM_MANIFEST = process.argv.includes("--from-manifest");

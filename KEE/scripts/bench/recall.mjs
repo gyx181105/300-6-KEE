@@ -20,7 +20,7 @@
 //   node scripts/bench/recall.mjs --table runs/588                        # 把记下的几轮排成表
 //
 // `--known shown|empty` 只是**标签**：提示词里带不带前面分块认下的实体，由服务端的
-// `UTOPIA_EXTRACT_KNOWN_IN_PROMPT` 决定（#588），起服务时定死，台子改不了也查不到。
+// `KEE_EXTRACT_KNOWN_IN_PROMPT` 决定（#588），起服务时定死，台子改不了也查不到。
 // 标签写进记录，`--table` 按它分组；与服务端对不上，那一轮的数就是错的。
 //
 // 环境变量：BENCH_BASE / BENCH_EMAIL / BENCH_PASSWORD / BENCH_PSQL（同 run.mjs）。
@@ -51,7 +51,7 @@ if (args.table) {
   process.exit(0);
 }
 if (args.known !== undefined && !["shown", "empty"].includes(args.known)) {
-  console.error("--known 只认 shown 或 empty（与服务端的 UTOPIA_EXTRACT_KNOWN_IN_PROMPT 对上）");
+  console.error("--known 只认 shown 或 empty（与服务端的 KEE_EXTRACT_KNOWN_IN_PROMPT 对上）");
   process.exit(1);
 }
 if (args.out && !args.known) {
@@ -67,7 +67,7 @@ if (!KB) {
 function psql(sql) {
   const cmd =
     process.env.BENCH_PSQL ||
-    "docker exec -e PGPASSWORD=utopia landscapebi-db-1 psql -U utopia -d utopia -tAc";
+    "docker exec -e PGPASSWORD=kee landscapebi-db-1 psql -U kee -d kee -tAc";
   const parts = cmd.split(" ");
   return execFileSync(parts[0], [...parts.slice(1), sql], { encoding: "utf8", maxBuffer: 64 << 20 }).trim();
 }
@@ -419,7 +419,7 @@ const docs = (await api("GET", `/api/v1/kbs/${KB}/documents?limit=200`)).docs.fi
 const endpoint = args.reprocess ? "reprocess" : "extract";
 // 墙钟从这一刻算到每篇最后一块抽完：取库的时钟，与 extracted_at 同一个钟
 const queuedAt = psql("SELECT now()::text");
-if (args.known) console.log(`这一轮标 known=${args.known}：服务端的 UTOPIA_EXTRACT_KNOWN_IN_PROMPT 得对得上`);
+if (args.known) console.log(`这一轮标 known=${args.known}：服务端的 KEE_EXTRACT_KNOWN_IN_PROMPT 得对得上`);
 for (const d of docs) {
   await api("POST", `/api/v1/documents/${d.id}/${endpoint}`, {});
   console.log(`${stamp()} 排队 ${endpoint} ${d.filename}`);

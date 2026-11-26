@@ -9,10 +9,10 @@ import { execFileSync } from "node:child_process";
 export const BASE = process.env.BENCH_BASE || "http://127.0.0.1:8322";
 export const EMAIL = process.env.BENCH_EMAIL || "bench@test.local";
 export const PASSWORD = process.env.BENCH_PASSWORD || "benchbench123";
-const PSQL = process.env.BENCH_PSQL || "docker exec -e PGPASSWORD=utopia landscapebi-db-1 psql -U utopia -d utopia -tAc";
+const PSQL = process.env.BENCH_PSQL || "docker exec -e PGPASSWORD=kee landscapebi-db-1 psql -U kee -d kee -tAc";
 /// 应用库与语料库都不是 BENCH_PSQL 里写的那个：**测量台跑在自己的库上**
 /// （bench/README 的第一条规则），而 BENCH_PSQL 与 govern.mjs 共用，指着开发库
-export const APP_DB = process.env.BENCH_APP_DB || "utopia_mapbench";
+export const APP_DB = process.env.BENCH_APP_DB || "kee_mapbench";
 
 export function parseArgs(argv) {
   return Object.fromEntries(

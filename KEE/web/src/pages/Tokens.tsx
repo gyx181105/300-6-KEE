@@ -45,7 +45,7 @@ function mcpSnippet(kbId: string, kbName: string, token: string): string {
     .replace(/^-+|-+$/g, "") || "kb";
   const cfg = {
     mcpServers: {
-      [`utopia-${slug}`]: {
+      [`kee-${slug}`]: {
         type: "http",
         url: `${window.location.origin}/api/v1/kbs/${kbId}/mcp`,
         headers: { Authorization: `Bearer ${token}` },

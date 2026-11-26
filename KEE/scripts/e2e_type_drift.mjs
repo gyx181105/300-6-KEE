@@ -9,7 +9,7 @@
 // 按提示词特征识别裁决请求并全判 same）。无 embedding 配置 → 走"无上下文可比"的
 // 宁分勿合 + 审核对路径。
 //
-// 前置：utopia-server 已启动并连到一个干净的库。编排见 scripts/e2e_type_drift.sh。
+// 前置：kee-server 已启动并连到一个干净的库。编排见 scripts/e2e_type_drift.sh。
 // 环境变量：E2E_BASE（默认 http://127.0.0.1:8317）、E2E_MOCK_PORT（默认 9317）。
 
 import http from "node:http";
@@ -59,15 +59,15 @@ const EXTRACTIONS = {
   "E2E-DOC3": {
     entities: [
       { name: "Orion platform team", type: "team" },
-      { name: "Utopia Labs", type: "organization" },
+      { name: "KEE Labs", type: "organization" },
     ],
     facts: [
       {
         subject: "Orion platform team",
         predicate: "part_of",
-        object: "Utopia Labs",
+        object: "KEE Labs",
         confidence: 0.9,
-        quote: "The Orion platform team is part of Utopia Labs.",
+        quote: "The Orion platform team is part of KEE Labs.",
       },
     ],
   },
@@ -186,7 +186,7 @@ async function main() {
   await pushDocAndWait(kbId, "orion-roadmap.md",
     "[E2E-DOC2] Roadmap. Bob Li took over as lead of the Orion platform team on 2024-05-20.");
   await pushDocAndWait(kbId, "orion-wiki.md",
-    "[E2E-DOC3] Wiki. The Orion platform team is part of Utopia Labs.");
+    "[E2E-DOC3] Wiki. The Orion platform team is part of KEE Labs.");
 
   // 攒批裁决在后台链式合并：等审核队列清空且同名实体收敛为一个
   const survivor = await poll("adjudication converges to one entity", 90000, async () => {
@@ -219,8 +219,8 @@ async function main() {
   check(!!bob && (bob.valid_from ?? "").startsWith("2024-05-20") && bob.valid_to === null,
     "Bob's tenure open from 2024-05-20");
   const partOf = facts.find((f) => f.predicate_key === "part_of" && f.direction === "out");
-  check(!!partOf && partOf.other_name === "Utopia Labs",
-    "concept-side fact (part_of Utopia Labs) survived the merge onto the survivor");
+  check(!!partOf && partOf.other_name === "KEE Labs",
+    "concept-side fact (part_of KEE Labs) survived the merge onto the survivor");
 
   // 可回滚：撤销最近一次合并 → 被并方复活、类型恢复快照、同名组重新出现
   await api("POST", `/kbs/${kbId}/merges/${review.merges[0].id}/revert`);

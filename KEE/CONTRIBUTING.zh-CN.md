@@ -1,4 +1,4 @@
-# 参与 Utopia
+# 参与 KEE
 
 [English](CONTRIBUTING.md)
 
@@ -26,7 +26,7 @@ git push -u origin fix/some-thing
 
 - **发版之后紧接着把 `main` 回合进 `dev`。** `dev → main` 那个 merge 节点只存在于 `main`，不回合的话 `main` 会显示成领先，尽管两边文件一模一样，而且每发一版就多领先一个。
 - **紧急修复也走 `dev`。** 直接对 `main` 开 PR 是唯一会让两条分支真正分叉的口子，分叉之后就得有人手工对账。
-- **发版要把 compose 的固定标签跟上。** `docker-compose.yml` 里 `UTOPIA_IMAGE` 默认指向一个固定标签，README 那条「一条命令启动」跑的就是它。发一版的完整动作是：`dev → main` 合并、打标签发布，然后在 `dev` 上开一个 PR 把这个固定值改到新标签。rc6、rc7 发版时都漏了这一步，照 README 起来的人跑的是三周前的 rc5。rc8 起的标签是多架构的，固定值从 rc8 起就指在多架构标签上。
+- **发版要把 compose 的固定标签跟上。** `docker-compose.yml` 里 `KEE_IMAGE` 默认指向一个固定标签，README 那条「一条命令启动」跑的就是它。发一版的完整动作是：`dev → main` 合并、打标签发布，然后在 `dev` 上开一个 PR 把这个固定值改到新标签。rc6、rc7 发版时都漏了这一步，照 README 起来的人跑的是三周前的 rc5。rc8 起的标签是多架构的，固定值从 rc8 起就指在多架构标签上。
 
 两个分支都开了保护：必须走 PR，CI（`backend` 与 `web`）必须通过，禁止强推与删除，管理员同样受约束。
 
@@ -48,7 +48,7 @@ Rust 解析器读不了的 PDF 会交给 `pdftotext`。源码部署还需要安�
 
 ```bash
 docker compose up -d db                 # pgvector 版 Postgres
-cargo run -p utopia-server              # 自动跑迁移，:1516
+cargo run -p kee-server              # 自动跑迁移，:1516
 cd web && pnpm install && pnpm dev      # :5173，/api 代理到后端
 ```
 
@@ -68,22 +68,22 @@ cd web && pnpm install --frozen-lockfile && pnpm build   # build 含类型检查
 这是这个仓库最容易误判的一点。`cargo test --workspace` 全绿不等于全跑了 —— 一批测试开头长这样：
 
 ```rust
-let Ok(url) = std::env::var("UTOPIA_DATABASE_URL") else {
-    eprintln!("跳过：未设 UTOPIA_DATABASE_URL");
+let Ok(url) = std::env::var("KEE_DATABASE_URL") else {
+    eprintln!("跳过：未设 KEE_DATABASE_URL");
     return Ok(());
 };
 ```
 
 它们守的是**编译器看不见的东西**：SQL 里的表别名、`NULL` 参与比较时的行为、`INNER JOIN` 悄悄滤掉的行、递归 CTE 在菱形继承下会不会把同一个祖先展开两次。`cargo check` 和 clippy 对这些一个字都不说。
 
-碰了 `crates/utopia-store/` 里的 SQL，请把它设上再跑一遍。库要先迁移好——绝大多数连库测试不自己跑迁移，对着空库直接跑会成片报 relation does not exist：
+碰了 `crates/kee-store/` 里的 SQL，请把它设上再跑一遍。库要先迁移好——绝大多数连库测试不自己跑迁移，对着空库直接跑会成片报 relation does not exist：
 
 ```bash
 # 1517 是宿主机侧端口：docker-compose.yml 显式避开 5432，以免和本地已经
 # 跑着的 PG 撞上。容器内仍是 5432，app 在 compose 网络里走 db:5432；
 # 这条 1517 只给宿主机上跑的代码连容器用。
-export UTOPIA_DATABASE_URL=postgres://utopia:utopia@localhost:1517/utopia
-cargo run -p utopia-store --example migrate   # 空库先迁移；CI 的 backend job 也是这么做的
+export KEE_DATABASE_URL=postgres://kee:kee@localhost:1517/kee
+cargo run -p kee-store --example migrate   # 空库先迁移；CI 的 backend job 也是这么做的
 cargo test --workspace
 ```
 

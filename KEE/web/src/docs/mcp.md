@@ -1,6 +1,6 @@
 # Agents over MCP
 
-Utopia serves every knowledge base as a **Model Context Protocol** server. Any MCP client — Claude Desktop, Cursor, an agent framework, a script — can search a base, read a document, look up an entity and ask what changed, with the same permissions as the person whose token it carries. Reading needs nothing but a token. One tool records: `remember` asks a `write` token held by an editor, and what it records **waits for a person's nod** before it reaches the graph.
+KEE serves every knowledge base as a **Model Context Protocol** server. Any MCP client — Claude Desktop, Cursor, an agent framework, a script — can search a base, read a document, look up an entity and ask what changed, with the same permissions as the person whose token it carries. Reading needs nothing but a token. One tool records: `remember` asks a `write` token held by an editor, and what it records **waits for a person's nod** before it reaches the graph.
 
 ## Get a token
 
@@ -47,10 +47,10 @@ Three methods are served:
 | `changes` | What the graph learned or revised in a window of **record** time: asserted, corrected, rejected, merged. Needs no entity; use it when the question names a period, not a subject. Returns up to 40 events per call; use `offset` to continue |
 | `list_rules` | Business rules with their conditions and conclusions, followed by declared ontology axioms (transitive, symmetric, inverse and sub-property) with the properties and relations they imply; the section says when derivation is off for this base |
 | `rule_matches` | The entities a business rule currently marks, with its premises. Takes a business rule ID from `list_rules` |
-| `search_docs` | Utopia's own manual, for questions about how the platform works. Never the user's documents |
+| `search_docs` | KEE's own manual, for questions about how the platform works. Never the user's documents |
 | `remember` | Record one sentence into the base's memory. **Needs a `write` token held by an editor**; a token without it does not see this tool in `tools/list`, and calling it anyway says why |
 
-The two time axes matter here. `at` reads **world time** (when something was true); `as_of` reads **record time** (what Utopia held at that moment, before it revised it), and `changes` lists what moved on that axis in a window. They are separate parameters on purpose: folded into one they would answer "what happened in March" with "what we learned in March", and both look plausible.
+The two time axes matter here. `at` reads **world time** (when something was true); `as_of` reads **record time** (what KEE held at that moment, before it revised it), and `changes` lists what moved on that axis in a window. They are separate parameters on purpose: folded into one they would answer "what happened in March" with "what we learned in March", and both look plausible.
 
 A derived fact returned by `entity_facts` names the rule that produced it. For an ontology
 axiom, the text includes its defining property, such as `[rule: inverse of works_at]`.
@@ -68,7 +68,7 @@ It uses RDF reification, PROV-O and schema.org. This mapping is the compatibilit
 boundary: a breaking change needs a decision record explaining why.
 
 Entities, assertions, derivations, rules and documents have UUID-based IRIs:
-`urn:utopia:kb:{kb_id}:entity:{id}`, `…:fact:{id}`, `…:derived:{id}`,
+`urn:kee:kb:{kb_id}:entity:{id}`, `…:fact:{id}`, `…:derived:{id}`,
 `…:rule:{id}` and `…:document:{id}`. The same stored object keeps its identity across exports;
 rebuilding a graph is not an identity-preserving operation. `?base=https://example.org/`
 instead mints `https://example.org/kb/{kb_id}/{kind}/{id}`. Keep the same base when
@@ -80,11 +80,11 @@ key-based IRI. It copies declarations within the base; it does not add reciproca
 links or compute a transitive closure.
 
 A derivation links to `…:rule:{id}` through `prov:wasGeneratedBy`. The rule
-resource is typed `prov:Activity` and, by family, `urn:utopia:ns:AxiomRule` or
-`urn:utopia:ns:BusinessRule`; it carries an `rdfs:label` (the business rule's
-name, or the axiom rule's kind). An axiom rule also states `urn:utopia:ns:axiomKind`
+resource is typed `prov:Activity` and, by family, `urn:kee:ns:AxiomRule` or
+`urn:kee:ns:BusinessRule`; it carries an `rdfs:label` (the business rule's
+name, or the axiom rule's kind). An axiom rule also states `urn:kee:ns:axiomKind`
 (`transitive`, `symmetric`, `inverse` or `sub_property`) and
-`urn:utopia:ns:declaredOn`, the predicate the axiom is declared on, which for
+`urn:kee:ns:declaredOn`, the predicate the axiom is declared on, which for
 `inverse` and `sub_property` is not the conclusion's predicate. A business rule's
 criteria, operands and expressions are not exported: a rule IRI identifies the
 stored rule, not a historical version of its definition, and a business rule is
@@ -194,7 +194,7 @@ The Review card names the agent, not only the person: several clients can share 
 List the tools:
 
 ```bash
-curl -s -X POST https://your-utopia/api/v1/kbs/$KB/mcp \
+curl -s -X POST https://your-kee/api/v1/kbs/$KB/mcp \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
@@ -202,12 +202,12 @@ curl -s -X POST https://your-utopia/api/v1/kbs/$KB/mcp \
 Search, then read the whole document the best hit came from:
 
 ```bash
-curl -s -X POST https://your-utopia/api/v1/kbs/$KB/mcp \
+curl -s -X POST https://your-kee/api/v1/kbs/$KB/mcp \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":2,"method":"tools/call",
        "params":{"name":"search_chunks","arguments":{"query":"Series C target"}}}'
 
-curl -s -X POST https://your-utopia/api/v1/kbs/$KB/mcp \
+curl -s -X POST https://your-kee/api/v1/kbs/$KB/mcp \
   -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":3,"method":"tools/call",
        "params":{"name":"get_document","arguments":{"document_id":"<id from the hit>"}}}'
@@ -224,8 +224,8 @@ Most MCP clients accept a remote server as a URL plus headers. For a client that
 ```json
 {
   "mcpServers": {
-    "utopia-general": {
-      "url": "https://your-utopia/api/v1/kbs/<kb_id>/mcp",
+    "kee-general": {
+      "url": "https://your-kee/api/v1/kbs/<kb_id>/mcp",
       "headers": { "Authorization": "Bearer utp_pat_…" }
     }
   }

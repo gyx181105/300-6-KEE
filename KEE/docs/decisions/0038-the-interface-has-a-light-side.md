@@ -69,7 +69,7 @@ a value.
 
 ## Decisions
 
-1. **Dark is the default; light is a choice; system is a third.** Stored as `utopia.theme`
+1. **Dark is the default; light is a choice; system is a third.** Stored as `kee.theme`
    in the browser, never sent to the backend. A script in `index.html` runs before first
    paint and sets `data-theme` from storage, so a refresh does not flash dark before turning
    light. The menu under the avatar offers the three.

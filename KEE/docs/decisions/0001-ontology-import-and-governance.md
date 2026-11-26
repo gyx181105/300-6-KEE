@@ -118,7 +118,7 @@ since moved to `scripts/bench/` (0012); these numbers are real but no longer com
     (seed or hand-made placeholder) is claimed by the vocabulary and takes its shape (#78, #145).
 18. **Individuals (ABox) are never imported as facts.** Every fact needs an evidence chain; instances
     stay in the stored file as future background knowledge for the reasoner.
-19. **Parser**: `oxttl` + `oxrdfxml` in `utopia-ingest`, Turtle and RDF/XML only; no `horned-owl`, no
+19. **Parser**: `oxttl` + `oxrdfxml` in `kee-ingest`, Turtle and RDF/XML only; no `horned-owl`, no
     reasoning, no export. Validated on FOAF (635 triples) and DCTerms (700 triples). The file
     extension is the strong format signal; content overrides it only when it is clearly Turtle.
 20. **Attributes** (`create_attribute_with_iri`): `rdfs:range` → `datatype` three ways. A mappable XSD

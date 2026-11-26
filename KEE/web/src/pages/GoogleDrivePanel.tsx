@@ -86,7 +86,7 @@ export function GoogleDrivePanel({ kbId, source }: { kbId: string; source: Sourc
   const connect = useMutation({
     mutationFn: async () => {
       // 先同步地开一个空弹窗，再填地址：等请求回来再 window.open 会被拦
-      const w = window.open("", "utopia-google-drive", "width=520,height=680");
+      const w = window.open("", "kee-google-drive", "width=520,height=680");
       try {
         const { url } = await api.googleDriveConnect(kbId, source.id);
         if (w) w.location.href = url;

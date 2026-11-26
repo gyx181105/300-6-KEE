@@ -52,7 +52,7 @@ export function Shell() {
     queryFn: api.health,
   });
   const { kb, kbs, setKb, settled } = useKb();
-  // 标题跟随当前 tab：`Graph · Utopia`；文档查看页归入 Library
+  // 标题跟随当前 tab：`Graph · KEE`；文档查看页归入 Library
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const tabLabel =
     TABS.find((t) => pathname.startsWith(t.to))?.label ??

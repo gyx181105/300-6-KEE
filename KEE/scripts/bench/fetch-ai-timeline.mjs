@@ -16,7 +16,7 @@
 
 import { execFileSync } from "node:child_process";
 
-const UA = "Utopia-bench/0.1 (+https://utopia.bi; corpus builder)";
+const UA = "KEE-bench/0.1 (+https://kee.bi; corpus builder)";
 
 // **走 curl，不走 fetch。** 这台机器上 HTTP(S)_PROXY 指向本地代理，
 // Node 20 的 undici 不读这两个环境变量（NODE_USE_ENV_PROXY 是 24 才加的），

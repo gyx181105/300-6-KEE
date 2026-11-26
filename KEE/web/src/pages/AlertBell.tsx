@@ -58,7 +58,7 @@ function line(d: AlertGroup["lines"][number]): string | null {
 /** 哪些告警带「再跑一遍」：故障修好之后（充值、改端点）任务不会自己回来的那几种 */
 const REQUEUE_KINDS = new Set(["llm.out_of_credit", "llm.unreachable"]);
 
-/* 轻重是服务端定的（`utopia-store/src/alerts.rs` 的 severity），一组取组里最重的
+/* 轻重是服务端定的（`kee-store/src/alerts.rs` 的 severity），一组取组里最重的
    那一档。**告警不全是故障**：欠费、源同步失败是 error，限流、schema 没摄进来、
    治理跳闸是 warning，而「映射探索一条口径都没提出来」是 info——它是"你等的那件
    事没有结果"，不是坏了。从前这一栏一概不看 severity，七种告警长得一模一样。 */

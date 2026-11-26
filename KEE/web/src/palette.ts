@@ -1,10 +1,10 @@
 /* 实体类型的数据色（规矩 4：彩色只属于数据）。从 ui/index.tsx 搬到这里（0038），
  * 因为 style-guard 现在不许页面和组件里出现色值本身，而这一份**是数据**，且要与
- * `crates/utopia-store/src/palette.rs` 逐字一致。浅色版暂时沿用同一套：换一套浅底
+ * `crates/kee-store/src/palette.rs` 逐字一致。浅色版暂时沿用同一套：换一套浅底
  * 专用的数据色得连服务端那份一起换，另开一刀。 */
 
 /* ---------- ColorPicker（精选色板 + hex 兜底；实体色刻意不开放全色域） ----------
-   **改这里就得改 `crates/utopia-store/src/palette.rs`**：手动挑的色与自动按 key
+   **改这里就得改 `crates/kee-store/src/palette.rs`**：手动挑的色与自动按 key
    取的色必须来自同一组，否则一张图里会出现两套配色。那边有测试盯着，改漏了会红。 */
 export const ENTITY_PALETTE = [
   "#7fd0ff",
@@ -26,7 +26,7 @@ export const ENTITY_PALETTE = [
 ];
 
 /**
- * 类的 key → 颜色。**必须与 `crates/utopia-store/src/palette.rs` 的
+ * 类的 key → 颜色。**必须与 `crates/kee-store/src/palette.rs` 的
  * `color_for_key` 逐位一致**：新建类时前端先按 key 挑一个显示出来，
  * 用户不改就这么存下去；而导入/消解那条路是后端算的。两边算得不一样，
  * 同一个 key 就会因为「谁建的」而拿到不同颜色。

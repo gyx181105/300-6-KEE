@@ -29,7 +29,7 @@ import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const UA = "Utopia-bench/0.1 (+https://utopia.bi; truth builder)";
+const UA = "KEE-bench/0.1 (+https://kee.bi; truth builder)";
 
 // **走 curl，不走 fetch**：理由见 fetch-ai-timeline.mjs（本机代理与 Node 20 的 undici）
 const curl = (url) =>

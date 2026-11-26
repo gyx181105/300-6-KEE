@@ -16,7 +16,7 @@
 // 会把它当成人的先例。台账里 agent 自己的行（actor 为空）留着无妨——先例只认人的。
 //
 // 环境变量：BENCH_BASE（默认 http://127.0.0.1:8322）、BENCH_EMAIL / BENCH_PASSWORD、
-//           BENCH_PSQL（默认 docker exec … psql -d utopia）。
+//           BENCH_PSQL（默认 docker exec … psql -d kee）。
 
 import fs from "node:fs";
 import path from "node:path";
@@ -49,7 +49,7 @@ async function api(method, url, body) {
   return text ? JSON.parse(text) : null;
 }
 function psql(sql) {
-  const cmd = process.env.BENCH_PSQL || "docker exec -e PGPASSWORD=utopia landscapebi-db-1 psql -U utopia -d utopia -tAc";
+  const cmd = process.env.BENCH_PSQL || "docker exec -e PGPASSWORD=kee landscapebi-db-1 psql -U kee -d kee -tAc";
   const parts = cmd.split(" ");
   return execFileSync(parts[0], [...parts.slice(1), sql], { encoding: "utf8", maxBuffer: 64 << 20 }).trim();
 }

@@ -24,5 +24,5 @@ function makeStore(key: string) {
   };
 }
 
-export const wsStore = makeStore("utopia.ws");
-export const kbStore = makeStore("utopia.kb");
+export const wsStore = makeStore("kee.ws");
+export const kbStore = makeStore("kee.kb");

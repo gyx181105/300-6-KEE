@@ -20,14 +20,14 @@ COPY migrations/ migrations/
 # docs_corpus.rs 用 include_str! 把产品内文档编进二进制，所以它是后端的源码依赖，
 # 不只是前端资源——漏掉这行，cargo build 直接报 couldn't read。
 COPY web/src/docs/ web/src/docs/
-RUN cargo build --release -p utopia-server
+RUN cargo build --release -p kee-server
 
 # ---- 运行 ----
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates poppler-utils poppler-data && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-COPY --from=build /src/target/release/utopia-server /usr/local/bin/utopia-server
+COPY --from=build /src/target/release/kee-server /usr/local/bin/kee-server
 COPY --from=web /src/dist /app/web-dist
-ENV UTOPIA_WEB_DIST=/app/web-dist
+ENV KEE_WEB_DIST=/app/web-dist
 EXPOSE 1516
-CMD ["utopia-server"]
+CMD ["kee-server"]

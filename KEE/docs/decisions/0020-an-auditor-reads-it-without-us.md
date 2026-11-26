@@ -8,7 +8,7 @@
 
 ## Who this is for
 
-Not another Utopia. A regulator, an auditor, or the team's own graph tooling: someone who has a triple store and a question about a decision that was made, and who should not have to learn our JSON to answer it. That fixes what the export must carry — **the intervals and the lineage**, not just the current edges — and it fixes the failure mode: an export that reads as a clean, confident graph while dropping the fact that half of it was retracted in March is worse than no export.
+Not another KEE. A regulator, an auditor, or the team's own graph tooling: someone who has a triple store and a question about a decision that was made, and who should not have to learn our JSON to answer it. That fixes what the export must carry — **the intervals and the lineage**, not just the current edges — and it fixes the failure mode: an export that reads as a clean, confident graph while dropping the fact that half of it was retracted in March is worse than no export.
 
 ## Identity
 
@@ -46,11 +46,11 @@ notice into structured output. It remains a ranked candidate lookup; a more
 specific name narrows a truncated result. These additions preserve the current
 fact fields; a compact fact representation is a separate proposal.
 
-Classes and relations that came in from an import **keep the IRI they came with**. A base built from the schema.org pack exports `schema:Organization`, not a Utopia mint of it, so the file lines up with the vocabulary the reader already has. That is the payoff for having stored `iri` on `entity_types` and `relation_types` since the first import.
+Classes and relations that came in from an import **keep the IRI they came with**. A base built from the schema.org pack exports `schema:Organization`, not a KEE mint of it, so the file lines up with the vocabulary the reader already has. That is the payoff for having stored `iri` on `entity_types` and `relation_types` since the first import.
 
 Everything else is minted under a base namespace: entities, documents, and one IRI per fact. Facts get their own IRI rather than blank nodes because a statement someone may have to cite has to be addressable, and because `supersedes` needs somewhere to point. A class or relation the ontology grew itself is minted from its **key** rather than its uuid — the key is what the base already uses as its identifier (`UNIQUE (kb_id, key)`, and it is what the extraction prompt and the API speak), so the file stays readable; a rename is the one event that moves such an IRI, and renaming a class is rarer than reading the export.
 
-The default namespace is a URN — `urn:utopia:kb:{kb_id}:entity:{uuid}` — and `?base=https://…/` overrides it for a deployment that publishes at a known address. The default is stable rather than dereferenceable, which is the right way round: two exports of the same base a year apart must line up, and a self-hosted deployment does not know its own public URL. Minting from the request's `Host` header would have made identity depend on which proxy the exporter came through.
+The default namespace is a URN — `urn:kee:kb:{kb_id}:entity:{uuid}` — and `?base=https://…/` overrides it for a deployment that publishes at a known address. The default is stable rather than dereferenceable, which is the right way round: two exports of the same base a year apart must line up, and a self-hosted deployment does not know its own public URL. Minting from the request's `Host` header would have made identity depend on which proxy the exporter came through.
 
 ## Intervals ride on the statement, not the triple
 
@@ -76,9 +76,9 @@ so a reader parsed a label to learn whether it came from an axiom or a business
 rule, and for `inverse` and `sub_property` could not recover which predicate the
 axiom was declared on without re-deriving the engine's convention from the exported
 `owl:inverseOf` / `rdfs:subPropertyOf`. Three minted terms close that: every rule
-resource is typed `utopia:AxiomRule` or `utopia:BusinessRule`; an axiom rule
-carries `utopia:axiomKind` (the closed enum `transitive`, `symmetric`, `inverse`,
-`sub_property`) and `utopia:declaredOn`, the IRI of the predicate the declaration
+resource is typed `kee:AxiomRule` or `kee:BusinessRule`; an axiom rule
+carries `kee:axiomKind` (the closed enum `transitive`, `symmetric`, `inverse`,
+`sub_property`) and `kee:declaredOn`, the IRI of the predicate the declaration
 sits on, which for `inverse` and `sub_property` differs from the conclusion's
 `rdf:predicate`. The label stays. Nothing about business-rule bodies is added, for
 the reason under **What is not here**. Storage names stay out of the vocabulary.

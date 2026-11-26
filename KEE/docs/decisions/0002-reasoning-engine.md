@@ -19,7 +19,7 @@ corpus is cleaned, then materialization is switched on.
 
 ## Decisions
 
-1. **R0 checks and writes no facts.** Pure logic in `utopia-reason`; kinds `self_loop`, `asymmetry`,
+1. **R0 checks and writes no facts.** Pure logic in `kee-reason`; kinds `self_loop`, `asymmetry`,
    `cycle` (depth-first, with the full `path`), `functional` (including inverse-functional) and
    `signature` (#190 / #196: subject outside the domain or object outside the range, computed in SQL
    by `store::reasoning::signature_breaks`; untyped entities excluded). Rows go to `axiom_violations`,

@@ -2,7 +2,7 @@
 
    **绑定由本人完成**：账户页上「绑定身份」跳到身份提供方，回来时服务端核对还是那个
    已登录的人才写绑定。管理页只列出谁绑了哪个 subject、能解绑——没有替别人绑定的入口，
-   那是一条冒充任何人登录的路（见 crates/utopia-server/src/api/oidc_routes.rs 的模块说明）。 */
+   那是一条冒充任何人登录的路（见 crates/kee-server/src/api/oidc_routes.rs 的模块说明）。 */
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../api";

@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="assets/banner.webp" alt="Utopia" width="820">
+<img src="assets/banner.webp" alt="KEE" width="820">
 
 </div>
 
-# Utopia
+# KEE
 
 <div align="center">
 
@@ -14,13 +14,13 @@
 [![License](https://img.shields.io/badge/LICENSE-APACHE%202.0-3FB950?style=flat-square&labelColor=161B22)](LICENSE)
 [![Rust](https://img.shields.io/badge/BUILT%20WITH-RUST-F74C00?style=flat-square&labelColor=161B22&logo=rust&logoColor=FFFFFF)](https://www.rust-lang.org)
 
-[![Official site](https://img.shields.io/badge/OFFICIAL-UTOPIA.BI-FFFFFF?style=flat-square&labelColor=161B22&logo=safari&logoColor=FFFFFF)](https://utopia.bi)
-[![Container](https://img.shields.io/badge/GHCR-DEEPLETHE%2FUTOPIA-2496ED?style=flat-square&labelColor=161B22&logo=docker&logoColor=FFFFFF)](https://github.com/deeplethe/utopia/pkgs/container/utopia)
+[![Official site](https://img.shields.io/badge/OFFICIAL-KEE.BI-FFFFFF?style=flat-square&labelColor=161B22&logo=safari&logoColor=FFFFFF)](https://kee.bi)
+[![Container](https://img.shields.io/badge/GHCR-DEEPLETHE%2FKEE-2496ED?style=flat-square&labelColor=161B22&logo=docker&logoColor=FFFFFF)](https://github.com/deeplethe/utopia/pkgs/container/utopia)
 [![Discussions](https://img.shields.io/badge/DISCUSSIONS-8957E5?style=flat-square&labelColor=161B22&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI0ZGRkZGRiIgY2xhc3M9ImJpIGJpLWNoYXQtZG90cy1maWxsIiB2aWV3Qm94PSIwIDAgMTYgMTYiPgogIDxwYXRoIGQ9Ik0xNiA4YzAgMy44NjYtMy41ODIgNy04IDdhOSA5IDAgMCAxLTIuMzQ3LS4zMDZjLS41ODQuMjk2LTEuOTI1Ljg2NC00LjE4MSAxLjIzNC0uMi4wMzItLjM1Mi0uMTc2LS4yNzMtLjM2Mi4zNTQtLjgzNi42NzQtMS45NS43Ny0yLjk2NkMuNzQ0IDExLjM3IDAgOS43NiAwIDhjMC0zLjg2NiAzLjU4Mi03IDgtN3M4IDMuMTM0IDggN001IDhhMSAxIDAgMSAwLTIgMCAxIDEgMCAwIDAgMiAwbTQgMGExIDEgMCAxIDAtMiAwIDEgMSAwIDAgMCAyIDBtMyAxYTEgMSAwIDEgMCAwLTIgMSAxIDAgMCAwIDAgMiIvPgo8L3N2Zz4%3D)](https://github.com/deeplethe/utopia/discussions)
 [![Built by DeepLethe](https://img.shields.io/badge/BUILT%20BY-DEEPLETHE-2D333B?style=flat-square&labelColor=161B22)](https://github.com/deeplethe)
 [![English](https://img.shields.io/badge/LANG-ENGLISH-DA3633?style=flat-square&labelColor=161B22)](README.md)
 
-<a href="https://trendshift.io/repositories/159739?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-159739" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/159739/daily?language=Python" alt="deeplethe%2Futopia | Trendshift" width="250" height="55"/></a>  <a href="https://trendshift.io/repositories/159739?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-159739" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/159739/weekly?language=Python&v=2" alt="deeplethe%2Futopia | Trendshift" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/159739?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-159739" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/159739/daily?language=Python" alt="deeplethe%2Fkee | Trendshift" width="250" height="55"/></a>  <a href="https://trendshift.io/repositories/159739?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-159739" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/159739/weekly?language=Python&v=2" alt="deeplethe%2Fkee | Trendshift" width="250" height="55"/></a>
 
 </div>
 
@@ -44,13 +44,13 @@ https://github.com/user-attachments/assets/aa226443-75de-437e-bd80-88e592ed8457
 
 ## 项目的世界观
 
-我们给它取了一个稍显浪漫的名字——**Utopia（乌托邦）**。托勒密的地心说曾在很长一段时间中被视为真理，后来被哥白尼、开普勒、伽利略与牛顿一步步证伪。现在回过头来看，我们记住的不止是「日心说是对的」，而是这段历史如何发展。
+我们给它取名为 **KEE**。托勒密的地心说曾在很长一段时间中被视为真理，后来被哥白尼、开普勒、伽利略与牛顿一步步证伪。现在回过头来看，我们记住的不止是「日心说是对的」，而是这段历史如何发展。
 
-不同于现有向量知识库、知识图谱工作追求当下知识的正确，Utopia 的设计初衷之一是记录完整的认知变化历程。工程上实现为**双时态知识图谱**。在决策复盘时，该系统可以拿到完整的决策过程与依据。为了提升可用性，我们基于公开的企业信息、教育、金融、法律、科研等领域语料库做了大量迭代。时态能力只是其中一面，如何接纳知识、如何推演未来、如何让逻辑约束行动，见 [utopia.bi/philosophy](https://utopia.bi/philosophy)。
+不同于现有向量知识库、知识图谱工作追求当下知识的正确，KEE 的设计初衷之一是记录完整的认知变化历程。工程上实现为**双时态知识图谱**。在决策复盘时，该系统可以拿到完整的决策过程与依据。为了提升可用性，我们基于公开的企业信息、教育、金融、法律、科研等领域语料库做了大量迭代。时态能力只是其中一面，如何接纳知识、如何推演未来、如何让逻辑约束行动，见 [kee.bi/philosophy](https://kee.bi/philosophy)。
 
 ## 适用场景
 
-Utopia 能解决什么问题，按人带着来的那个问题来说。除注明外都是现在就能用的；每一条都需要配一个对话模型，拿不准的地方都留给人在审核里定。
+KEE 能解决什么问题，按人带着来的那个问题来说。除注明外都是现在就能用的；每一条都需要配一个对话模型，拿不准的地方都留给人在审核里定。
 
 | 谁、什么问题 | 输入 | 问什么，得到什么 | 比检索和 RAG 多出来的 |
 |---|---|---|---|
@@ -94,13 +94,13 @@ Utopia 能解决什么问题，按人带着来的那个问题来说。除注明�
 
 ```bash
 git clone https://github.com/deeplethe/utopia.git
-cd utopia
+cd kee
 docker compose --profile app up -d
 ```
 
 打开 http://localhost:1516 注册 —— 第一个账户自动成为管理员，同时系统会创建所有人可读的公共知识库。抽取业务文档前，请先在「管理 → 模型」里配置模型端点（chat 与 embedding）。
 
-数据库口令（`.env` 里的 `UTOPIA_DB_PASSWORD`，默认 `utopia`）在数据卷首次初始化时写入。已经跑起来的部署要改口令，得同时改库里那份——`docker compose exec db psql -U utopia -c "ALTER USER utopia PASSWORD '<新口令>'"`——或者 `docker compose --profile app down -v` 从头来过（会删掉全部数据）。
+数据库口令（`.env` 里的 `KEE_DB_PASSWORD`，默认 `kee`）在数据卷首次初始化时写入。已经跑起来的部署要改口令，得同时改库里那份——`docker compose exec db psql -U kee -c "ALTER USER kee PASSWORD '<新口令>'"`——或者 `docker compose --profile app down -v` 从头来过（会删掉全部数据）。
 
 或者从源码构建：
 
@@ -115,7 +115,7 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml --profile app u
 docker compose up -d db
 
 # 2. 启动后端（自动跑迁移，默认 :1516）
-cargo run -p utopia-server
+cargo run -p kee-server
 
 # 3. 启动前端（:5173，/api 代理到后端）
 cd web && pnpm install && pnpm dev
@@ -134,7 +134,7 @@ cd web && pnpm install && pnpm dev
 
 ## 当前状态
 
-Utopia 仍处于 **v0.1**。数据库 schema 会随版本演进，迁移只前滚、不提供回退 —— 生产环境请用 `UTOPIA_IMAGE` 锁定具体版本，并在升级前备份数据库与 `data` 目录。
+KEE 仍处于 **v0.1**。数据库 schema 会随版本演进，迁移只前滚、不提供回退 —— 生产环境请用 `KEE_IMAGE` 锁定具体版本，并在升级前备份数据库与 `data` 目录。
 
 公网部署前请阅读 [SECURITY.md](SECURITY.md)。
 

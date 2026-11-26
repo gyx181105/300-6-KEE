@@ -103,7 +103,7 @@ A run is synchronous in this cut: a person presses Run and waits for the row. Wh
 
 ## Phasing
 
-1. **Capability.** Schema, `utopia-store::actions`, the runner in `utopia-server` (render, send, record), the routes, this record. Tests: the store's (create, grant, a viewer never sees the auth block, a run lands as a row) and the runner's against wiremock (rendering by kind, a placeholder in the host refused, an unknown argument refused, a bound enforced, a redirect into the intranet from a public host refused, the body cap, the deadline).
+1. **Capability.** Schema, `kee-store::actions`, the runner in `kee-server` (render, send, record), the routes, this record. Tests: the store's (create, grant, a viewer never sees the auth block, a run lands as a row) and the runner's against wiremock (rendering by kind, a placeholder in the host refused, an unknown argument refused, a bound enforced, a redirect into the intranet from a public host refused, the body cap, the deadline).
 2. **Administration.** Two entries in the administration rail: **Actions** (the registry as a table, a dialog to write one, a dialog to grant it, a test run) and **Action log** (the deployment's runs, filters outside the panel, a row opens to show the request and the response). A base gains an **Actions** tab: what it was granted, a Run dialog built from the parameters, and the base's own log.
 3. **Rules fire actions.** Its own record.
 

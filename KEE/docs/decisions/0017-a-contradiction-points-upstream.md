@@ -39,7 +39,7 @@ like any other.
 
 ## Decisions
 
-### 1. Detection: two tiers, pure logic in `utopia-reason`
+### 1. Detection: two tiers, pure logic in `kee-reason`
 
 `derive::contradictions(derived, edges, axioms)` checks every derivation against the axioms
 of its predicate, once against assertions and once against other derivations:
@@ -172,7 +172,7 @@ asserted, `left` is the contradicted assertion and `right` the derivation's last
 
 ### 6. Tests
 
-- `utopia-reason` unit tests: one per axiom, non-overlapping intervals are no contradiction,
+- `kee-reason` unit tests: one per axiom, non-overlapping intervals are no contradiction,
   derived-vs-derived aggregates by rule pair, the cap is counted
 - Store integration: a functional assertion stands and a derivation collides → the
   derivation stays out and one violation carries `detail`; retract the assertion and rerun →

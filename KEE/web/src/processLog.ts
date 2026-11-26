@@ -61,7 +61,7 @@ export type ProcessSummary = {
 /** 完成后在活动面板里再留一会儿，好让人看见「完成」 */
 export const COMPLETED_HOLD_MS = 12_000;
 const MAX_LINES = 40;
-const STORAGE_KEY = "utopia-process-log-v1";
+const STORAGE_KEY = "kee-process-log-v1";
 
 const INGEST_INDEX: Record<string, number> = {
   pending: 0,

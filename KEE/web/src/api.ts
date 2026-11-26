@@ -45,7 +45,7 @@ function streamFailure(data: string): string {
 
 /** 会话 JWT。正常靠 HttpOnly cookie；部分浏览器/代理下 cookie 落不下时
  *  （login 200 随后 me 401），用登录响应里的 token 作 Bearer 兜底。 */
-const SESSION_KEY = "utopia.session";
+const SESSION_KEY = "kee.session";
 
 export function setSessionToken(token: string | null) {
   if (token) sessionStorage.setItem(SESSION_KEY, token);
@@ -280,7 +280,7 @@ export interface SourceView {
     /** google_drive：连上的 Google 账号；`connected_at` 有值即已连接（令牌从不下发） */
     account_email?: string | null;
     connected_at?: string;
-    /** google_drive：连上的那个 Utopia 用户；浏览与选文件夹只给他 */
+    /** google_drive：连上的那个 KEE 用户；浏览与选文件夹只给他 */
     connected_by?: string;
     /** google_drive：连上的那个人连接时的名字，断开前的确认里用 */
     connected_by_name?: string;

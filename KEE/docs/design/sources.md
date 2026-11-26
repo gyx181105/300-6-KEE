@@ -64,7 +64,7 @@ purge and reappearance are fenced by database time; one Readability extractor se
 and the API carries a typed nested `rss_full_content` summary [0033].
 
 **Parse and chunk.** The parser's Markdown is read into blocks (heading, paragraph, table with header
-and rows, rule); the packer fills a token budget (300 by default, cl100k, `UTOPIA_CHUNK_TOKENS`); a
+and rows, rule); the packer fills a token budget (300 by default, cl100k, `KEE_CHUNK_TOKENS`); a
 table travels with its caption and header and a continuation repeats both; a caption attaches to
 every table that follows it; a row is never split; headings become a breadcrumb prefix and
 `chunks.heading`; a thematic break is not a boundary and a table it split is joined back; no

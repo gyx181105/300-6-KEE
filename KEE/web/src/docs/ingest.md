@@ -1,12 +1,12 @@
 # Ingest interfaces
 
-Utopia pulls or receives documents through **sources**. Two source kinds speak JSON and are meant for integration: **Custom** (Utopia polls your service) and **API** (your service pushes to Utopia). Both share the same identity semantics: every item has a stable ID, and pushing or returning the same ID again **updates the same document in place** — the previous content is kept as a version, search re-indexes, and the knowledge graph re-extracts.
+KEE pulls or receives documents through **sources**. Two source kinds speak JSON and are meant for integration: **Custom** (KEE polls your service) and **API** (your service pushes to KEE). Both share the same identity semantics: every item has a stable ID, and pushing or returning the same ID again **updates the same document in place** — the previous content is kept as a version, search re-indexes, and the knowledge graph re-extracts.
 
 ## Choosing between them
 
 | | Custom (pull) | API (push) | Statements (push) |
 |---|---|---|---|
-| Who initiates | Utopia, on a schedule | Your service, any time | Your service, any time |
+| Who initiates | KEE, on a schedule | Your service, any time | Your service, any time |
 | Auth | Optional header you configure | Per-source Bearer token | Per-source Bearer token |
 | What you send | Items with text | Documents with text | Statements already in the extraction contract; no model reads them |
 | Fits | Feeds, exports, periodic snapshots | Event-driven systems, scripts, CI | Sensors, event buses, anything that already knows `{thing, relation, value, when}` |
@@ -18,10 +18,10 @@ Utopia pulls or receives documents through **sources**. Two source kinds speak J
 
 RSS sources keep the existing `rss` source kind and can run in either mode:
 
-- **Feed content only** (`content_mode: "feed"`) preserves compatibility. Utopia stores the feed body or summary and does not request the linked article.
+- **Feed content only** (`content_mode: "feed"`) preserves compatibility. KEE stores the feed body or summary and does not request the linked article.
 - **Full article content for new items** (`content_mode: "full_new_items"`) is opt-in. The first successful sync records the current feed as a baseline and imports no documents. Later entries are discovered durably and hydrated in the background.
 
-Full-content hydration prefers substantive feed-native HTML (`content:encoded`) and converts it to safe Markdown. If that is absent or too thin, Utopia fetches the first alternate HTTP(S) article link through a bounded SSRF-resistant client, applies readability extraction, and converts the result to Markdown. A failed linked fetch or summary-only entry stays retryable or terminal with a typed diagnostic; it is never marked as completed full content. The source bar shows labeled pending, queued, retrying, complete, and terminal counts; per-entry troubleshooting data remains internal.
+Full-content hydration prefers substantive feed-native HTML (`content:encoded`) and converts it to safe Markdown. If that is absent or too thin, KEE fetches the first alternate HTTP(S) article link through a bounded SSRF-resistant client, applies readability extraction, and converts the result to Markdown. A failed linked fetch or summary-only entry stays retryable or terminal with a typed diagnostic; it is never marked as completed full content. The source bar shows labeled pending, queued, retrying, complete, and terminal counts; per-entry troubleshooting data remains internal.
 
 Only newly observed entries after activation are eligible for hydration. Changing from feed mode to full mode, or changing the feed URL while full mode is active, starts a new baseline generation; changing back stops new hydration work but preserves the ledger history. Browser rendering, authenticated pages, cookies, paywall bypass, challenge solving, recursive links, assets, and transcription are not part of this path.
 
@@ -29,7 +29,7 @@ Only newly observed entries after activation are eligible for hydration. Changin
 
 ## Custom source — the pull interface
 
-Create a **Custom** source and point it at any URL you control. On every sync (manual, interval, or cron) Utopia sends:
+Create a **Custom** source and point it at any URL you control. On every sync (manual, interval, or cron) KEE sends:
 
 ```
 GET {endpoint}?since=2026-08-26T19:43:24Z
@@ -79,7 +79,7 @@ Notes:
 Create an **API** source; it gets its own push token (view or rotate it from the source's Token dialog). Then:
 
 ```
-POST {your-utopia-base}/api/v1/sources/{source_id}/ingest
+POST {your-kee-base}/api/v1/sources/{source_id}/ingest
 Authorization: Bearer utp_…
 Content-Type: application/json
 ```
@@ -114,7 +114,7 @@ With `external_id`, the id is the identity: the same content under a new id neve
 Example with curl:
 
 ```bash
-curl -X POST "https://utopia.example.com/api/v1/sources/01a0…/ingest" \
+curl -X POST "https://kee.example.com/api/v1/sources/01a0…/ingest" \
   -H "Authorization: Bearer utp_…" \
   -H "Content-Type: application/json" \
   -d '{"filename":"runbook.md","content":"# Runbook v2 …","external_id":"note-42"}'
@@ -127,7 +127,7 @@ curl -X POST "https://utopia.example.com/api/v1/sources/01a0…/ingest" \
 Create a **Statements** source; it gets its own push token like an API source. Use it when your system already holds the statement and would otherwise have to write it out as prose for a model to read back. Nothing here calls a model: the body is stored as the document and read by the same parser that reads the extractor's reply, so a pushed statement is an open statement in every respect a document's is. It reaches the typed graph the same way, through alignment, never before.
 
 ```
-POST {your-utopia-base}/api/v1/sources/{source_id}/statements
+POST {your-kee-base}/api/v1/sources/{source_id}/statements
 Authorization: Bearer utp_…
 Content-Type: application/json
 ```
@@ -169,7 +169,7 @@ The response is the API push's: `{ "action": "created" }` · `updated` · `uncha
 An API or Statements source's document can be read back by the identity it was pushed under: its `external_id`, or for an API push without one, its `filename`. The identity goes in the query string, URL-encoded, so it may contain `/`.
 
 ```
-GET {your-utopia-base}/api/v1/kbs/{kb_id}/sources/{source_id}/documents/by-external-id?external_id=note-42
+GET {your-kee-base}/api/v1/kbs/{kb_id}/sources/{source_id}/documents/by-external-id?external_id=note-42
 Authorization: Bearer utp_pat_…
 ```
 
@@ -202,7 +202,7 @@ The credential is a personal access token (or a signed-in session) of someone wh
 A service can search the base's chunks with the same personal access token. The push token is not accepted here either.
 
 ```
-POST {your-utopia-base}/api/v1/kbs/{kb_id}/search
+POST {your-kee-base}/api/v1/kbs/{kb_id}/search
 Authorization: Bearer utp_pat_…
 Content-Type: application/json
 

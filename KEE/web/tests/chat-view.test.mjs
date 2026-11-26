@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { createServer } from "vite";
 // From web/ after installing the app dependencies (no app dependency/lockfile changes):
-// npm install --prefix /tmp/utopia-chat-browser-test --no-audit --no-fund --package-lock=false playwright-core@1.58.2
-// CHAT_PLAYWRIGHT_PATH=/tmp/utopia-chat-browser-test/node_modules/playwright-core CHAT_CHROMIUM_PATH="/path/to/chromium" node --test tests/chat-view.test.mjs
+// npm install --prefix /tmp/kee-chat-browser-test --no-audit --no-fund --package-lock=false playwright-core@1.58.2
+// CHAT_PLAYWRIGHT_PATH=/tmp/kee-chat-browser-test/node_modules/playwright-core CHAT_CHROMIUM_PATH="/path/to/chromium" node --test tests/chat-view.test.mjs
 // Set CHAT_CHROMIUM_PATH to an installed Chrome/Chromium executable, e.g.
 // /Applications/Google Chrome.app/Contents/MacOS/Google Chrome on macOS.
 // These on-demand Node browser tests are separate from pnpm test (Vitest) and CI.

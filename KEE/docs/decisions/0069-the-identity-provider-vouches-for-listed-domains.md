@@ -6,15 +6,15 @@
 
 ## Problem
 
-Until now an identity reached an account only when its owner linked it: sign in with a password, then go through SSO from the account page (0056). A company that puts Utopia behind its own identity provider wants the opposite: everyone with a company address signs in with SSO on day one, nobody keeps a Utopia password, and the password form is gone. With linking by hand only, each of those people would first need a password account, which is what the company is trying to get rid of.
+Until now an identity reached an account only when its owner linked it: sign in with a password, then go through SSO from the account page (0056). A company that puts KEE behind its own identity provider wants the opposite: everyone with a company address signs in with SSO on day one, nobody keeps a KEE password, and the password form is gone. With linking by hand only, each of those people would first need a password account, which is what the company is trying to get rid of.
 
 Migration 0056 rejected linking by email for a reason that still holds in general: an email is a mutable claim, and letting it decide which account a person is hands that decision to whoever controls the claim. This record says when that reason does not apply, and what the deployment then trusts.
 
 ## Decisions
 
-1. **`UTOPIA_OIDC_ALLOWED_DOMAINS` lists the domains the identity provider is authoritative for.** On a login or an exchange whose subject is not linked, a token whose `email` is in a listed domain and whose `email_verified` is true is mapped by email: to the active account with that address (case-insensitive), or to a new one. The subject is then linked to it, so later sign-ins go by subject as before. The list is empty by default, and an empty list keeps 0056's rule exactly.
+1. **`KEE_OIDC_ALLOWED_DOMAINS` lists the domains the identity provider is authoritative for.** On a login or an exchange whose subject is not linked, a token whose `email` is in a listed domain and whose `email_verified` is true is mapped by email: to the active account with that address (case-insensitive), or to a new one. The subject is then linked to it, so later sign-ins go by subject as before. The list is empty by default, and an empty list keeps 0056's rule exactly.
 
-   **Revision 2026-10-22 (#1355).** The `email` claim arrives only when the authorization request asks for the `email` scope. The scopes are now `UTOPIA_OIDC_SCOPES` (default `openid profile email`), so a deployment that lists domains must keep `email` in them, or no address reaches this rule and nobody is linked or opened by domain; the server warns at startup when the list is set and `email` is missing.
+   **Revision 2026-10-22 (#1355).** The `email` claim arrives only when the authorization request asks for the `email` scope. The scopes are now `KEE_OIDC_SCOPES` (default `openid profile email`), so a deployment that lists domains must keep `email` in them, or no address reaches this rule and nobody is linked or opened by domain; the server warns at startup when the list is set and `email` is missing.
 
    **Revision 2026-10-16 (#1258).** This assumed the active match was unique. Checking `users_email_active_idx` showed that it compares the stored spelling, while registration and administrator-created accounts preserve casing: two active accounts can differ only in email case. `account_for_sso` now refuses multiple active case-insensitive matches as `unlinked` before creating an account or writing an identity, rather than choosing one. The check covers the query snapshot; a unique index on `lower(email)`, normalization at registration and administrator creation, and a decision about existing duplicates remain separate work.
 
@@ -26,17 +26,17 @@ Migration 0056 rejected linking by email for a reason that still holds in genera
 
 5. **A new account is a viewer of the default workspace with no password**, the way registration places a second user; when the deployment has no one yet, it is the first admin. Its password hash is `!`, which no password verifies. Password login still runs a full argon2 check against a dummy hash for it, so the response time does not tell which accounts are SSO-only.
 
-6. **The domain list overrides closed registration.** `UTOPIA_OPEN_REGISTRATION=false` and the admin toggle govern self-service password sign-up. A deployment that lists domains has already decided who may come in, and it is the same deployment that closes registration to stop strangers signing up with a password. Honouring the toggle here would make provisioning useless where it is wanted.
+6. **The domain list overrides closed registration.** `KEE_OPEN_REGISTRATION=false` and the admin toggle govern self-service password sign-up. A deployment that lists domains has already decided who may come in, and it is the same deployment that closes registration to stop strangers signing up with a password. Honouring the toggle here would make provisioning useless where it is wanted.
 
-7. **`UTOPIA_PASSWORD_LOGIN=false` turns off password login and registration, only while SSO is configured.** Without SSO it would lock everyone out, so the server ignores it, as the login page does, and says so in a warning at startup. It also warns when password login is off and the domain list is empty, because then only people who linked an identity earlier can sign in.
+7. **`KEE_PASSWORD_LOGIN=false` turns off password login and registration, only while SSO is configured.** Without SSO it would lock everyone out, so the server ignores it, as the login page does, and says so in a warning at startup. It also warns when password login is off and the domain list is empty, because then only people who linked an identity earlier can sign in.
 
-8. **Keep one admin with a password.** Turning `UTOPIA_PASSWORD_LOGIN` back on is the way in when the identity provider fails, but an SSO-opened account has no password and no reset path, and that includes a first admin bootstrapped through SSO. A deployment that turns password login off should first make sure one admin account has a password.
+8. **Keep one admin with a password.** Turning `KEE_PASSWORD_LOGIN` back on is the way in when the identity provider fails, but an SSO-opened account has no password and no reset path, and that includes a first admin bootstrapped through SSO. A deployment that turns password login off should first make sure one admin account has a password.
 
 9. **Small hardening of the claims.** `email_verified` is read leniently: `true` or the string `"true"` counts, anything else does not, because every token passes through this parser and a provider sending a string would otherwise stop every login. The `name` claim is trimmed and cut to 64 characters, and an empty one falls back to the address's local part. The exchange does not return the internal reason it refused a mapping; it logs it.
 
 ## Dead ends
 
-- **Linking by email without a domain list.** Any provider account with a matching verified address could take over a Utopia account, including one that was registered with a password. That is 0056's objection, and it stands.
+- **Linking by email without a domain list.** Any provider account with a matching verified address could take over a KEE account, including one that was registered with a password. That is 0056's objection, and it stands.
 - **Respecting closed registration for new accounts.** See decision 6: it would only link people who already had a password account, which is the case the feature exists to remove.
 
 ## Open questions

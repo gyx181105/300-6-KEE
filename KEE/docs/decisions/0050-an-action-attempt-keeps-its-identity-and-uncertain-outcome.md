@@ -42,7 +42,7 @@ After a short authorization/revision check and CAS transaction, no database lock
 remain held across the network. Changes to permissions before this gate reject;
 a revocation after it cannot recall a request. Row-lock order for action, grants,
 parameters and run must be specified in the implementation. The experiment locks
-one simplified definition row, **not** Utopia's production permission tables.
+one simplified definition row, **not** KEE's production permission tables.
 
 Keep HTTP status, capture state (complete/truncated/read_error/absent), safe excerpt,
 original dispatch token, dispatch/observation/finish timestamps and immutable safe

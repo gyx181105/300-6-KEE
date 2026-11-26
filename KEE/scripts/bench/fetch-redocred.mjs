@@ -73,7 +73,7 @@ for (let i = 0; i < missing.length; i += 50) {
   const url = "https://www.wikidata.org/w/api.php?" + new URLSearchParams({
     action: "wbgetentities", ids: ids.join("|"), props: "labels|descriptions", languages: "en", format: "json",
   });
-  const r = await fetch(url, { headers: { "user-agent": "utopia-bench/0.1 (typed-graph bench)" } });
+  const r = await fetch(url, { headers: { "user-agent": "kee-bench/0.1 (typed-graph bench)" } });
   const j = await r.json();
   for (const [pid, e] of Object.entries(j.entities)) {
     relInfo[pid] = { label: e.labels?.en?.value ?? pid, description: e.descriptions?.en?.value ?? "" };

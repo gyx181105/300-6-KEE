@@ -1,0 +1,26 @@
+[package]
+name = "kee-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "kee"
+path = "src/main.rs"
+
+[dependencies]
+kee-core.workspace = true
+anyhow.workspace = true
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+sha2.workspace = true
+dotenvy.workspace = true
+sqlx.workspace = true
+tokio.workspace = true
+tempfile.workspace = true
+
+[dev-dependencies]
+kee-store.workspace = true

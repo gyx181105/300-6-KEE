@@ -1,4 +1,4 @@
-# Contributing to Utopia
+# Contributing to KEE
 
 [中文](CONTRIBUTING.zh-CN.md)
 
@@ -26,7 +26,7 @@ Merging `dev → main` is done by maintainers on their own schedule; contributor
 
 - **Back-merge `main` into `dev` right after a release.** The `dev → main` merge commit lives only on `main`, so without this `main` reads as ahead even though the trees are identical, and the gap grows by one every release.
 - **Urgent fixes go through `dev` too.** A PR opened straight against `main` is the one thing that makes the two branches genuinely diverge, and then someone has to reconcile them by hand.
-- **A release moves the compose pin.** `docker-compose.yml` defaults `UTOPIA_IMAGE` to a fixed tag, and that tag is what the README's one-command start actually runs. Cutting a release is: merge `dev → main`, tag and publish, then a PR on `dev` that points the pin at the new tag. rc6 and rc7 shipped with the pin still on rc5, so everyone who followed the README ran a three-week-old build. Tags from rc8 on are multi-arch, and the pin has been on one of them since rc8.
+- **A release moves the compose pin.** `docker-compose.yml` defaults `KEE_IMAGE` to a fixed tag, and that tag is what the README's one-command start actually runs. Cutting a release is: merge `dev → main`, tag and publish, then a PR on `dev` that points the pin at the new tag. rc6 and rc7 shipped with the pin still on rc5, so everyone who followed the README ran a three-week-old build. Tags from rc8 on are multi-arch, and the pin has been on one of them since rc8.
 
 Both branches are protected: pull request required, CI (`backend` and `web`) must pass, no force pushes, no deletions, and admins are held to the same rules.
 
@@ -48,7 +48,7 @@ PDF text extraction also uses `pdftotext` when the Rust parser cannot read a fil
 
 ```bash
 docker compose up -d db                 # Postgres with pgvector
-cargo run -p utopia-server              # runs migrations, :1516
+cargo run -p kee-server              # runs migrations, :1516
 cd web && pnpm install && pnpm dev      # :5173, proxies /api to the backend
 ```
 
@@ -68,23 +68,23 @@ cd web && pnpm install --frozen-lockfile && pnpm build   # build type-checks
 This is the easiest thing to get wrong here. A green `cargo test --workspace` does not mean everything ran. A number of tests begin like this:
 
 ```rust
-let Some(url) = utopia_store::test_db::url() else {
+let Some(url) = kee_store::test_db::url() else {
     return Ok(());
 };
 ```
 
-`test_db::url()` reads `UTOPIA_DATABASE_URL`. With `UTOPIA_TEST_REQUIRE_DB=1` also set, a missing database is a failure rather than a skip — that is how the `migrations` job in CI runs the whole `utopia-store` suite, so a green run there means the SQL was exercised. Use the same guard in new tests; do not read the env var directly.
+`test_db::url()` reads `KEE_DATABASE_URL`. With `KEE_TEST_REQUIRE_DB=1` also set, a missing database is a failure rather than a skip — that is how the `migrations` job in CI runs the whole `kee-store` suite, so a green run there means the SQL was exercised. Use the same guard in new tests; do not read the env var directly.
 
 They guard what the compiler cannot see: table aliases inside SQL strings, how `NULL` behaves in a comparison, rows an `INNER JOIN` silently drops, whether a recursive CTE expands the same ancestor twice under diamond inheritance. `cargo check` and clippy say nothing about any of it.
 
-If you touched SQL under `crates/utopia-store/`, set it and run again:
+If you touched SQL under `crates/kee-store/`, set it and run again:
 
 ```bash
 # 1517 is the host-side port: docker-compose.yml deliberately avoids 5432
 # so a locally installed Postgres does not collide with the dev container.
 # Inside the compose network the app still talks to db:5432; 1517 is only
 # for code on the host reaching the container.
-export UTOPIA_DATABASE_URL=postgres://utopia:utopia@localhost:1517/utopia
+export KEE_DATABASE_URL=postgres://kee:kee@localhost:1517/kee
 cargo test --workspace
 ```
 
@@ -98,10 +98,10 @@ workspace suite. Busy-lock coverage calls the private materialization body from
 These tests do not register an asynchronous production handler.
 
 ```bash
-export UTOPIA_DATABASE_URL=postgres://.../dedicated_delivery_tests
-export UTOPIA_TEST_REQUIRE_DB=1
-cargo test --locked -p utopia-store --test human_phrase_materialization_delivery -- --ignored --skip crash_child --test-threads=1 --nocapture
-cargo test --locked -p utopia-store --lib materialize::delivery_tests::busy_defers_without_retaining_connections -- --ignored --test-threads=1 --nocapture
+export KEE_DATABASE_URL=postgres://.../dedicated_delivery_tests
+export KEE_TEST_REQUIRE_DB=1
+cargo test --locked -p kee-store --test human_phrase_materialization_delivery -- --ignored --skip crash_child --test-threads=1 --nocapture
+cargo test --locked -p kee-store --lib materialize::delivery_tests::busy_defers_without_retaining_connections -- --ignored --test-threads=1 --nocapture
 ```
 
 The first command explicitly runs both parents; the process-exit parent invokes

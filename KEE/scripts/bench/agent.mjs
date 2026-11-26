@@ -5,9 +5,9 @@
 //   - 「已有」答案的准确率：形状真的说的是那条属性、方向对不对；
 //   - token（服务端日志的 llm usage 行）。
 //
-//   BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d utopia_bench4 -tAc" \
+//   BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d kee_bench4 -tAc" \
 //   BENCH_SERVER_LOG=/path/to/server.log BENCH_JUDGE_BASE=... BENCH_JUDGE_KEY=... BENCH_JUDGE_MODEL=... \
-//   node scripts/bench/agent.mjs --kb <kb-id> --db utopia_bench4 --reset [--arms trimmed,full] [--out file.json]
+//   node scripts/bench/agent.mjs --kb <kb-id> --db kee_bench4 --reset [--arms trimmed,full] [--out file.json]
 //
 // **--reset 会删这个库里代理的提案（没采纳的）和看过的形状记录**，每臂开跑前各删一次，好让两臂
 // 看到同一批形状。只在测量库上用；不给 --reset 就不跑。

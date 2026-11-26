@@ -51,7 +51,7 @@ that production rule routes already perform it. Keep this separate from A0.
 
 Historical evidence at `30a0da8ca06ce19325432cfc6be0a3cbfecb642d` on Linux, Node 22.23.2 and PostgreSQL 16.15: ten Node model tests and one isolated PostgreSQL lock experiment passed. The lock probe observed `pg_blocking_pids` for a concurrent **non-key** datatype/unit update: `FOR SHARE` blocked it until commit; `FOR KEY SHARE` did not. This establishes a lock primitive, not production route validation.
 
-The historical standalone browser checked local model save/reopen, invalid constants and failed-save retention. It did not use Utopia APIs and supplies no evidence about a real picker at scale. Its scripts and page have been archived outside the repository, not translated into another executable policy. Model results are not tests of a production unit validator.
+The historical standalone browser checked local model save/reopen, invalid constants and failed-save retention. It did not use KEE APIs and supplies no evidence about a real picker at scale. Its scripts and page have been archived outside the repository, not translated into another executable policy. Model results are not tests of a production unit validator.
 
 The unlisted `/kb/$kbId/expression-draft` route opts into the exploration in `web/`. It uses structured drafts and the existing UI controls with authenticated attributes and rules from the current knowledge base. Draft previews do not persist anything. Attribute declarations are displayed, not interpreted as an approved unit language. The depth question remains a usability decision: automated interaction checks can establish structure, search and focus behavior, but cannot supply a person's tolerance for nested editing.
 

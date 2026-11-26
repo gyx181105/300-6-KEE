@@ -1,15 +1,15 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/utopia-core",
-    "crates/utopia-cli",
-    "crates/utopia-store",
-    "crates/utopia-server",
-    "crates/utopia-ingest",
-    "crates/utopia-extract",
-    "crates/utopia-reason",
-    "crates/utopia-search",
-    "crates/utopia-llm",
+    "crates/kee-core",
+    "crates/kee-cli",
+    "crates/kee-store",
+    "crates/kee-server",
+    "crates/kee-ingest",
+    "crates/kee-extract",
+    "crates/kee-reason",
+    "crates/kee-search",
+    "crates/kee-llm",
 ]
 
 [workspace.package]
@@ -19,8 +19,8 @@ license = "Apache-2.0"
 repository = "https://github.com/deeplethe/utopia"
 
 [workspace.dependencies]
-utopia-core = { path = "crates/utopia-core" }
-utopia-store = { path = "crates/utopia-store" }
+kee-core = { path = "crates/kee-core" }
+kee-store = { path = "crates/kee-store" }
 
 tokio = { version = "1", features = ["full"] }
 axum = { version = "0.8", features = ["multipart"] }
@@ -55,10 +55,10 @@ flate2 = "1"
 strum = { version = "0.27", features = ["derive"] }
 
 # Phase 1: 摄入/检索/LLM
-utopia-ingest = { path = "crates/utopia-ingest" }
-utopia-reason = { path = "crates/utopia-reason" }
-utopia-search = { path = "crates/utopia-search" }
-utopia-llm = { path = "crates/utopia-llm" }
+kee-ingest = { path = "crates/kee-ingest" }
+kee-reason = { path = "crates/kee-reason" }
+kee-search = { path = "crates/kee-search" }
+kee-llm = { path = "crates/kee-llm" }
 tantivy = "0.26"
 tantivy-jieba = "0.20"
 text-splitter = { version = "0.32", features = ["tiktoken-rs"] }

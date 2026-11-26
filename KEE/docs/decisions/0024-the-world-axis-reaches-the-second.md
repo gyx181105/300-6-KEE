@@ -28,7 +28,7 @@ A calendar date has no time zone; storing it at UTC midnight is a convention, no
 
 ### 4. The ladder is spelled in four places, from one list
 
-`utopia_store::graph::WORLD_PRECISIONS` is the list; `truncate_to` is the invariant in Rust for the write paths that take a value and a precision (`insert_fact`, `correct_interval`, `close_superseded`, `close_with_unknown_end`). The four spellings: `parse_time` (extractor and `parse_when`), `time_text::world` with `fmtTime` beside it, `rdf::world_time` (sub-day values go out as `xsd:dateTime` with an explicit `utopia:*Precision` literal, since the XSD type alone cannot say "to the minute"), and `coarsest` in the evaluator, whose rank order extends. Sub-day values print in the reduced ISO forms — `2026-06-01T14Z`, `2026-06-01T14:32Z`, `2026-06-01T14:32:07Z` — the same string parsing back to the same value and precision.
+`kee_store::graph::WORLD_PRECISIONS` is the list; `truncate_to` is the invariant in Rust for the write paths that take a value and a precision (`insert_fact`, `correct_interval`, `close_superseded`, `close_with_unknown_end`). The four spellings: `parse_time` (extractor and `parse_when`), `time_text::world` with `fmtTime` beside it, `rdf::world_time` (sub-day values go out as `xsd:dateTime` with an explicit `kee:*Precision` literal, since the XSD type alone cannot say "to the minute"), and `coarsest` in the evaluator, whose rank order extends. Sub-day values print in the reduced ISO forms — `2026-06-01T14Z`, `2026-06-01T14:32Z`, `2026-06-01T14:32:07Z` — the same string parsing back to the same value and precision.
 
 ## What a reader sees
 

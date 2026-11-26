@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="assets/banner.webp" alt="Utopia" width="820">
+<img src="assets/banner.webp" alt="KEE" width="820">
 
 </div>
 
-# Utopia
+# KEE
 
 <div align="center">
 
@@ -14,17 +14,17 @@
 [![License](https://img.shields.io/badge/LICENSE-APACHE%202.0-3FB950?style=flat-square&labelColor=161B22)](LICENSE)
 [![Rust](https://img.shields.io/badge/BUILT%20WITH-RUST-F74C00?style=flat-square&labelColor=161B22&logo=rust&logoColor=FFFFFF)](https://www.rust-lang.org)
 
-[![Official site](https://img.shields.io/badge/OFFICIAL-UTOPIA.BI-FFFFFF?style=flat-square&labelColor=161B22&logo=safari&logoColor=FFFFFF)](https://utopia.bi)
-[![Container](https://img.shields.io/badge/GHCR-DEEPLETHE%2FUTOPIA-2496ED?style=flat-square&labelColor=161B22&logo=docker&logoColor=FFFFFF)](https://github.com/deeplethe/utopia/pkgs/container/utopia)
+[![Official site](https://img.shields.io/badge/OFFICIAL-KEE.BI-FFFFFF?style=flat-square&labelColor=161B22&logo=safari&logoColor=FFFFFF)](https://kee.bi)
+[![Container](https://img.shields.io/badge/GHCR-DEEPLETHE%2FKEE-2496ED?style=flat-square&labelColor=161B22&logo=docker&logoColor=FFFFFF)](https://github.com/deeplethe/utopia/pkgs/container/utopia)
 [![Discussions](https://img.shields.io/badge/DISCUSSIONS-8957E5?style=flat-square&labelColor=161B22&logo=data:image/svg%2Bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgZmlsbD0iI0ZGRkZGRiIgY2xhc3M9ImJpIGJpLWNoYXQtZG90cy1maWxsIiB2aWV3Qm94PSIwIDAgMTYgMTYiPgogIDxwYXRoIGQ9Ik0xNiA4YzAgMy44NjYtMy41ODIgNy04IDdhOSA5IDAgMCAxLTIuMzQ3LS4zMDZjLS41ODQuMjk2LTEuOTI1Ljg2NC00LjE4MSAxLjIzNC0uMi4wMzItLjM1Mi0uMTc2LS4yNzMtLjM2Mi4zNTQtLjgzNi42NzQtMS45NS43Ny0yLjk2NkMuNzQ0IDExLjM3IDAgOS43NiAwIDhjMC0zLjg2NiAzLjU4Mi03IDgtN3M4IDMuMTM0IDggN001IDhhMSAxIDAgMSAwLTIgMCAxIDEgMCAwIDAgMiAwbTQgMGExIDEgMCAxIDAtMiAwIDEgMSAwIDAgMCAyIDBtMyAxYTEgMSAwIDEgMCAwLTIgMSAxIDAgMCAwIDAgMiIvPgo8L3N2Zz4%3D)](https://github.com/deeplethe/utopia/discussions)
 [![Built by DeepLethe](https://img.shields.io/badge/BUILT%20BY-DEEPLETHE-2D333B?style=flat-square&labelColor=161B22)](https://github.com/deeplethe)
 [![中文](https://img.shields.io/badge/LANG-%E4%B8%AD%E6%96%87-DA3633?style=flat-square&labelColor=161B22)](README.zh-CN.md)
 
-<a href="https://trendshift.io/repositories/159739?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-159739" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/159739/daily?language=Python" alt="deeplethe%2Futopia | Trendshift" width="250" height="55"/></a>  <a href="https://trendshift.io/repositories/159739?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-159739" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/159739/weekly?language=Python&v=2" alt="deeplethe%2Futopia | Trendshift" width="250" height="55"/></a>
+<a href="https://trendshift.io/repositories/159739?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-159739" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/159739/daily?language=Python" alt="deeplethe%2Fkee | Trendshift" width="250" height="55"/></a>  <a href="https://trendshift.io/repositories/159739?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-159739" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/159739/weekly?language=Python&v=2" alt="deeplethe%2Fkee | Trendshift" width="250" height="55"/></a>
 
 </div>
 
-**The enterprise world model built by [DeepLethe](https://deeplethe.com).** It is the first open substrate for knowledge engineering that learns passively and governs itself. Where a knowledge graph or a vector store works to hold present knowledge, Utopia puts time awareness and ontology in the base layer: the knowledge system evolves as material arrives, and conflict detection, reasoning and decision making all run against that ontology. It deploys offline, so a company can stand up a knowledge foundation, a decision core its agents can trust, and a compliance audit trail on hardware it controls.
+**The enterprise world model built by [DeepLethe](https://deeplethe.com).** It is the first open substrate for knowledge engineering that learns passively and governs itself. Where a knowledge graph or a vector store works to hold present knowledge, KEE puts time awareness and ontology in the base layer: the knowledge system evolves as material arrives, and conflict detection, reasoning and decision making all run against that ontology. It deploys offline, so a company can stand up a knowledge foundation, a decision core its agents can trust, and a compliance audit trail on hardware it controls.
 
 > Please note: we would rather this project were not framed as an open-source take on Palantir. It is **a different route to enterprise intelligence, built bottom up from knowledge governance to trustworthy decisions and simulation**.
 
@@ -44,13 +44,13 @@ https://github.com/user-attachments/assets/aa226443-75de-437e-bd80-88e592ed8457
 
 ## Philosophy
 
-We gave it a somewhat romantic name, **Utopia**. Ptolemy's geocentric model was taken for truth for a very long time, then falsified step by step by Copernicus, Kepler, Galileo and Newton. Looking back, what we keep is not only that heliocentrism turned out to be right; it is how that history unfolded.
+We gave it a somewhat romantic name, **KEE**. Ptolemy's geocentric model was taken for truth for a very long time, then falsified step by step by Copernicus, Kepler, Galileo and Newton. Looking back, what we keep is not only that heliocentrism turned out to be right; it is how that history unfolded.
 
-Where existing vector stores and knowledge graphs work to get present knowledge right, one of Utopia's founding aims is to record the whole course of changing understanding. Engineered, that becomes a **bitemporal knowledge graph**. When a decision is reviewed later, the system can produce the full course it took and the grounds it rested on. To make this hold up in practice we have iterated at length against public corpora spanning enterprise records, education, finance, law and research. Temporality is only one facet; for how knowledge is taken in, how the future is reasoned about, and how logic bounds action, see [utopia.bi/philosophy](https://utopia.bi/philosophy).
+Where existing vector stores and knowledge graphs work to get present knowledge right, one of KEE's founding aims is to record the whole course of changing understanding. Engineered, that becomes a **bitemporal knowledge graph**. When a decision is reviewed later, the system can produce the full course it took and the grounds it rested on. To make this hold up in practice we have iterated at length against public corpora spanning enterprise records, education, finance, law and research. Temporality is only one facet; for how knowledge is taken in, how the future is reasoned about, and how logic bounds action, see [kee.bi/philosophy](https://kee.bi/philosophy).
 
 ## Use cases
 
-What Utopia is for, in the shape of the question someone brings. Each is available today unless it says otherwise; each needs a chat model configured, and each leaves the doubtful cases to a person in Review.
+What KEE is for, in the shape of the question someone brings. Each is available today unless it says otherwise; each needs a chat model configured, and each leaves the doubtful cases to a person in Review.
 
 | Who and what | Input | Question, and what comes back | What the base adds over search or RAG |
 |---|---|---|---|
@@ -93,13 +93,13 @@ Start from the prebuilt image:
 
 ```bash
 git clone https://github.com/deeplethe/utopia.git
-cd utopia
+cd kee
 docker compose --profile app up -d
 ```
 
 Open http://localhost:1516 and register. The first account automatically becomes the administrator, and a public knowledge base readable by everyone is created at the same time. Before extracting business documents, configure the model endpoints (chat and embedding) under Administration → Models.
 
-The database password (`UTOPIA_DB_PASSWORD` in `.env`, default `utopia`) is applied when the data volume is first initialised. To change it on a running deployment, change it in the database as well — `docker compose exec db psql -U utopia -c "ALTER USER utopia PASSWORD '<new password>'"` — or start over with `docker compose --profile app down -v`, which deletes all data.
+The database password (`KEE_DB_PASSWORD` in `.env`, default `kee`) is applied when the data volume is first initialised. To change it on a running deployment, change it in the database as well — `docker compose exec db psql -U kee -c "ALTER USER kee PASSWORD '<new password>'"` — or start over with `docker compose --profile app down -v`, which deletes all data.
 
 Or build from source:
 
@@ -114,7 +114,7 @@ docker compose -f docker-compose.yml -f docker-compose.build.yml --profile app u
 docker compose up -d db
 
 # 2. Backend on :1516, runs migrations on startup
-cargo run -p utopia-server
+cargo run -p kee-server
 
 # 3. Frontend on :5173, proxying /api to the backend
 cd web && pnpm install && pnpm dev
@@ -132,7 +132,7 @@ cd web && pnpm install && pnpm dev
 
 ## Status
 
-Utopia is still at **v0.1**. The database schema evolves between versions and migrations only roll forward, with no rollback. Pin a specific version with `UTOPIA_IMAGE` in production, and back up the database along with the `data` directory before upgrading.
+KEE is still at **v0.1**. The database schema evolves between versions and migrations only roll forward, with no rollback. Pin a specific version with `KEE_IMAGE` in production, and back up the database along with the `data` directory before upgrading.
 
 Please read [SECURITY.md](SECURITY.md) before exposing it to the public internet.
 

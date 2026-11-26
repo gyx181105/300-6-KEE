@@ -26,7 +26,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.join(HERE, "corpora", "nvda-public-docs");
 
 // SEC 要求带能联系上的 User-Agent，否则 403。改成你自己的。
-const UA = process.env.SEC_USER_AGENT || "Utopia-bench (bench@example.com)";
+const UA = process.env.SEC_USER_AGENT || "KEE-bench (bench@example.com)";
 const BASE = "https://www.sec.gov/Archives/edgar/data/1045810";
 
 const DOCS = [

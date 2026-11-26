@@ -6,7 +6,7 @@
 
 ## Problem
 
-The export contains the assertions themselves but not the epistemic state the base has already established about them. A downstream reader gets two evidence-backed statements — "Acme revenue = 100M" and "Acme revenue = 130M" — with their provenance and intervals, and nothing that says Utopia considers them contested. The reader's options are to treat them as ordinary independent facts, or to re-implement the conflict detection Utopia already owns. Both are wrong in the way 0020 names: the export is the read contract, and the read contract has to carry what the ledger knows.
+The export contains the assertions themselves but not the epistemic state the base has already established about them. A downstream reader gets two evidence-backed statements — "Acme revenue = 100M" and "Acme revenue = 130M" — with their provenance and intervals, and nothing that says KEE considers them contested. The reader's options are to treat them as ordinary independent facts, or to re-implement the conflict detection KEE already owns. Both are wrong in the way 0020 names: the export is the read contract, and the read contract has to carry what the ledger knows.
 
 ## Decision
 
@@ -14,46 +14,46 @@ The export carries the two findings tables as two distinct resource classes. Bot
 
 ### Two classes, not one
 
-`utopia:FactConflict` and `utopia:AxiomViolation` stay separate because they are different claims:
+`kee:FactConflict` and `kee:AxiomViolation` stay separate because they are different claims:
 
 - A **fact conflict** says *two assertions disagree about the same ledger slot* — the ledger could not decide whether the new one closes the old one (`no_time`, `simultaneous`, `low_confidence`, `described_evidence`). Its adjudication is about the facts.
 - An **axiom violation** says *the data contradicts a rule the ontology currently declares*. Its adjudication is about whether the error is in the data or in the definition.
 
 Their resolution vocabularies are different for the same reason; flattening them into one class would force one column to mean two things.
 
-### `utopia:FactConflict`
+### `kee:FactConflict`
 
 A conflict is addressable at `conflict:{uuid}` under the base namespace. It points **from** the conflict **to** the two statements by their existing fact IRIs — a consumer that ignores conflicts reads facts exactly as before:
 
 ```
-<conflict> a utopia:FactConflict ;
-    utopia:reason "simultaneous" ;                -- no_time | simultaneous | low_confidence | described_evidence
-    utopia:priorStatement <fact/old> ;            -- the incumbent assertion
-    utopia:incomingStatement <fact/new> ;         -- the arriving assertion
-    utopia:status "open" ;                        -- open | resolved | withdrawn
-    utopia:resolution "closed" ;                  -- only when resolved: closed | kept_both | rejected_new
+<conflict> a kee:FactConflict ;
+    kee:reason "simultaneous" ;                -- no_time | simultaneous | low_confidence | described_evidence
+    kee:priorStatement <fact/old> ;            -- the incumbent assertion
+    kee:incomingStatement <fact/new> ;         -- the arriving assertion
+    kee:status "open" ;                        -- open | resolved | withdrawn
+    kee:resolution "closed" ;                  -- only when resolved: closed | kept_both | rejected_new
     prov:generatedAtTime "…" ;                    -- created_at: when the conflict was recorded
-    utopia:closedAt "…" .                         -- resolved_at, when set
+    kee:closedAt "…" .                         -- resolved_at, when set
 ```
 
 `status` and `resolution` are contract vocabulary — `contest_integrity` validates stored values against the listed sets before the first byte is emitted, so the contract promises the listed values and nothing else. `withdrawn` (0051) is a status, not an adjudication: its `closedAt` is the moment one side was invalidated — which is when the conflict stopped applying — not a page-open timestamp. Rows keep their real timestamps because `GET /export` has no `as_of` parameter: "was this contested in March" is answered from the payload or not at all.
 
-### `utopia:AxiomViolation`
+### `kee:AxiomViolation`
 
 A violation is addressable at `violation:{uuid}`:
 
 ```
-<violation> a utopia:AxiomViolation ;
-    utopia:kind "functional" ;                    -- the finding kinds below
-    utopia:status "open" ;                        -- open | resolved
-    utopia:resolution "accepted" ;                -- only when resolved
-    utopia:onStatement <fact/a> ;                 -- the statements the finding is about
-    utopia:onStatement <fact/b> ;
-    utopia:evidencePath ( <fact/a> <fact/mid> <fact/b> ) ;  -- ordered, when the row carries a path
-    utopia:onRelation <relation> ;                -- open rows only: the relation the criterion is declared on
-    utopia:criterion owl:FunctionalProperty ;     -- open rows only: the criterion itself
-    utopia:detectedAt "…" ;
-    utopia:closedAt "…" .
+<violation> a kee:AxiomViolation ;
+    kee:kind "functional" ;                    -- the finding kinds below
+    kee:status "open" ;                        -- open | resolved
+    kee:resolution "accepted" ;                -- only when resolved
+    kee:onStatement <fact/a> ;                 -- the statements the finding is about
+    kee:onStatement <fact/b> ;
+    kee:evidencePath ( <fact/a> <fact/mid> <fact/b> ) ;  -- ordered, when the row carries a path
+    kee:onRelation <relation> ;                -- open rows only: the relation the criterion is declared on
+    kee:criterion owl:FunctionalProperty ;     -- open rows only: the criterion itself
+    kee:detectedAt "…" ;
+    kee:closedAt "…" .
 ```
 
 The criterion link is what lets a reader re-derive the finding instead of trusting it. `kind` plus the relation names it exactly:
@@ -108,7 +108,7 @@ None of this enters the contract, now or later, just because it exists in storag
 
 ## Vocabulary added
 
-Everything without a standard spelling mints under `urn:utopia:ns:`: the classes `FactConflict` and `AxiomViolation`; the links `priorStatement`, `incomingStatement`, `onStatement`, `evidencePath`, `onRelation`, `criterion`; and the literals `reason`, `kind`, `status`, `resolution`, `detectedAt`, `closedAt`. The value sets above are the contract: readers should treat unknown values as a newer contract, not silently.
+Everything without a standard spelling mints under `urn:kee:ns:`: the classes `FactConflict` and `AxiomViolation`; the links `priorStatement`, `incomingStatement`, `onStatement`, `evidencePath`, `onRelation`, `criterion`; and the literals `reason`, `kind`, `status`, `resolution`, `detectedAt`, `closedAt`. The value sets above are the contract: readers should treat unknown values as a newer contract, not silently.
 
 ## Status history
 

@@ -115,7 +115,7 @@ export function DocsPage() {
   const toc = tocOf(doc.body);
   const mainRef = useRef<HTMLElement>(null);
   const [activeHeading, setActiveHeading] = useState<string | null>(null);
-  // 标题：`Utopia | {文章名}`——Charter 是门脸字标，标题直接给文章
+  // 标题：`KEE | {文章名}`——Charter 是门脸字标，标题直接给文章
   usePageTitle(S.app.name, doc.title);
   // 公开页也感知登录态：已登录给用户菜单，未登录给 Sign in
   const me = useQuery({ queryKey: ["me"], queryFn: fetchMe, retry: false });

@@ -261,7 +261,7 @@ the prompt, a description is read by people and by the aligner.
   affected signatures instead of re-extracting [0044].
 - **Standard vocabularies reify events as classes**, so every pack object property is a state; a
   person changes `temporal` on the page and reads pick it up at once, and a vocabulary that
-  annotates a property with `utopia:temporal` (what the export writes) is imported with that value,
+  annotates a property with `kee:temporal` (what the export writes) is imported with that value,
   a re-import updating an existing relation's [0031].
 
 ## Proposed and not built

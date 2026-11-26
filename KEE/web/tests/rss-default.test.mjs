@@ -6,8 +6,8 @@ import test from "node:test";
 import { createServer } from "vite";
 
 // From web/ (no changes to app dependencies or lockfile):
-// npm install --prefix /tmp/utopia-rss-browser-test --no-audit --no-fund --package-lock=false playwright-core@1.58.2
-// RSS_PLAYWRIGHT_PATH=/tmp/utopia-rss-browser-test/node_modules/playwright-core RSS_CHROMIUM_PATH=/home/jik/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell node --test tests/rss-default.test.mjs
+// npm install --prefix /tmp/kee-rss-browser-test --no-audit --no-fund --package-lock=false playwright-core@1.58.2
+// RSS_PLAYWRIGHT_PATH=/tmp/kee-rss-browser-test/node_modules/playwright-core RSS_CHROMIUM_PATH=/home/jik/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell node --test tests/rss-default.test.mjs
 // Point RSS_CHROMIUM_PATH at an installed Chromium on other machines.
 // Regression probes: prefix the test command with RSS_FORM_MUTATION=wrong-default
 // or RSS_FORM_MUTATION=disconnected-payload; each MUST fail. Mutations exist only
@@ -85,7 +85,7 @@ function fixturePlugin() {
 // No router harness exists in this crate; guard the production registration and
 // handler source directly, without constructing a parallel test-only router.
 test("entry diagnostics has no public route or client", async () => {
-  for (const path of ["../crates/utopia-server/src/api/mod.rs", "../crates/utopia-server/src/api/sources_routes.rs", "src/api.ts"]) {
+  for (const path of ["../crates/kee-server/src/api/mod.rs", "../crates/kee-server/src/api/sources_routes.rs", "src/api.ts"]) {
     const source = await readFile(new URL(path, new URL("../", import.meta.url)), "utf8");
     assert.doesNotMatch(source, /rss-full-content\/entries|full_content_entries|rssFullContentEntries|RssFullContentEntryDiagnostic/, path);
   }

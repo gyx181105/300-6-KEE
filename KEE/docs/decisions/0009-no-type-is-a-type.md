@@ -102,7 +102,7 @@ in the ontology as a class, as if someone had decided it.
 - **Resolving untyped entities.** The profile has no type dimension, so
   `classify_type_drift` lacks one criterion. Two untyped same-name entities go `Recall` and
   rely on profile similarity; whether that is enough is untested.
-- **Where `metric` / `dimension` belong.** Today they are builtin-on-demand. A "Utopia
+- **Where `metric` / `dimension` belong.** Today they are builtin-on-demand. A "KEE
   semantic layer" pack would move the last builtin classes out of code into something
   optional, with IRIs, replaceable (0016 D2).
 

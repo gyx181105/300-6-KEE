@@ -36,7 +36,7 @@ Derivations inherit it. `reasoning::timed_edges` maps `valid_to` to an open boun
 
 ### 1. One predicate, one place
 
-`crates/utopia-store/src/world_axis.rs`, beside `record_axis`: `facts_hold_at(alias, param)` and `derived_hold_at(alias, param)`. Every server read of the world axis takes them. The Rust-side filters in `tools.rs` stop re-implementing the rule: the reads they filter gain an `at` parameter and apply the same SQL.
+`crates/kee-store/src/world_axis.rs`, beside `record_axis`: `facts_hold_at(alias, param)` and `derived_hold_at(alias, param)`. Every server read of the world axis takes them. The Rust-side filters in `tools.rs` stop re-implementing the rule: the reads they filter gain an `at` parameter and apply the same SQL.
 
 The client never re-derives it either. Edges and entity facts gain `holds_from` / `holds_to` — the interval **as read**, projected by the same expression the predicate uses — and the slider and the panel filter on those. The stated interval stays in `valid_from` / `valid_to` for display. A second implementation of the rule in TypeScript would be the next place to forget a change.
 

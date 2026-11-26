@@ -1,0 +1,25 @@
+[package]
+name = "kee-store"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+kee-core.workspace = true
+kee-ingest.workspace = true
+kee-reason.workspace = true
+# 物化把属性的值按 datatype 与单位读成数、日期（`attribute_value`）
+kee-extract = { path = "../kee-extract" }
+serde.workspace = true
+pgvector.workspace = true
+futures-util.workspace = true
+cron.workspace = true
+sqlx.workspace = true
+tokio.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+sha2.workspace = true
+chrono.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+url = "2.5.8"

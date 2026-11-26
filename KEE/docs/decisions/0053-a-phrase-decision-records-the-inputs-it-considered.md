@@ -343,7 +343,7 @@ chat and MCP, an `end_after_period` field beside `valid_to` in MCP's structured 
 **Export.** This is a deliberate change at the compatibility boundary `web/src/docs/mcp.md`
 describes: for a marked row, the old `validThrough` named the next period. `validThrough` itself
 changes, rather than a separate term carrying the named period, as published on #994 on 2026-10-15:
-`validThrough "2024"^^xsd:gYear` with `utopia:endAfterPeriod true`. The stored instant can be
+`validThrough "2024"^^xsd:gYear` with `kee:endAfterPeriod true`. The stored instant can be
 recovered: when `endAfterPeriod` is true, it is the end of `validThrough`'s period (`bucket_end`),
 with `validThroughPrecision` for an end below a day.
 

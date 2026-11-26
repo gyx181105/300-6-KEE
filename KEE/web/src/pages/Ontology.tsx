@@ -88,7 +88,7 @@ const RAIL_ROW_H = 34;
 const RAIL_RESERVED = 80;
 /** 上次看的是表还是图。**per 浏览器不 per 库**：这是读法的习惯，
  *  换个知识库不会换读法 */
-const VIEW_KEY = "utopia.ontology.view";
+const VIEW_KEY = "kee.ontology.view";
 /** 兜底页行数（首帧未量到高度时用） */
 const RAIL_PAGE = 14;
 /** 过滤模式两节混排时每节的行数 */

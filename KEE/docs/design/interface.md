@@ -12,7 +12,7 @@ browser language is not guessed while the bundle trails; user-reachable server e
 `label` is data, `description` follows the base's `ontology_lang`, LLM text for people takes
 `locale` from the request, and extracted data stays verbatim [0004].
 
-**Theme.** Dark by default, light by choice, system as a third, stored as `utopia.theme` in the
+**Theme.** Dark by default, light by choice, system as a third, stored as `kee.theme` in the
 browser and set on `<html data-theme>` before first paint; only the token block changes, alpha
 describes hierarchy and the rgb triplet is what swaps; the canvas has one reader
 (`graphVisuals.ts`) that re-reads tokens and rebuilds the graph on a switch, edges flattened over

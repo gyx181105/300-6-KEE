@@ -47,7 +47,7 @@ earlier entities become a `system` message right before the question, and `ToolC
 omits tool fields on the wire.
 
 Degradation to one-shot RAG happens only when the first request that carries tools comes back
-400 or 422 (`utopia_llm::Rejected`). A network failure is an error frame. Revised 2026-09-27
+400 or 422 (`kee_llm::Rejected`). A network failure is an error frame. Revised 2026-09-27
 (#973): a context-window refusal is `ContextTooLong`, not `Rejected`; it drops older history and
 sends the request once more, see
 [below](#a-context-refusal-trims-history-once-973-revised-2026-09-27).
@@ -151,7 +151,7 @@ The 20-message window alone let ten large answers make every later turn fail (#9
 endpoint's context refusal was read as unsupported tools, so removing `tool_choice` and then
 falling back to RAG sent the same oversized history twice more. Three things change.
 
-**The refusal has its own class.** `utopia-llm` reads `context_length_exceeded` from the error
+**The refusal has its own class.** `kee-llm` reads `context_length_exceeded` from the error
 code first, then the vendor's wording (`maximum context length`, `context window`, `too many
 tokens`, `prompt is too long`, `exceeds the available context`), next to
 `stated_completion_ceiling`, and `rejected_shape` is false for it. DeepSeek's 400 carries only the

@@ -117,7 +117,7 @@ directly. The rest of this record makes it possible; this is the point.
 > the acquisition. The extractor's output per call does not grow with its input; handed more, it
 > picks the easiest few. The default is now 300, which is what the old character budget came to
 > in English and the condition the 43/45 rounds were measured under. Chinese gets less context
-> than it did; that is unmeasured and open. The budget is a knob (`UTOPIA_CHUNK_TOKENS`) so the
+> than it did; that is unmeasured and open. The budget is a knob (`KEE_CHUNK_TOKENS`) so the
 > next measurement does not need a rebuild.
 
 Counted with `tiktoken` cl100k, which is embedded in the crate and needs no network. It is not

@@ -4,7 +4,7 @@
 - **Written**: 2026-09-20 (conventions in the [README](README.md))
 - **Related**: [0009](0009-no-type-is-a-type.md)'s "NULL means undecided" is why several edges below are nullable and therefore cannot lean on `MATCH FULL`; [0002](0002-reasoning-engine.md) owns the derivation model whose premise edges are covered here. Mechanism choice resolved by PR #832; discussion tracked in issue #842.
 
-> The exporter writes `urn:utopia:kb:A:fact:{id}` and asserts the id belongs to knowledge base A. Nothing in the schema made that true — a foreign key proves the row exists, not which base it lives in. A cross-KB `supersedes` would mint a local IRI naming a foreign fact; a cross-KB `type_id` would resolve to nothing and the statement would silently lose its class. This record decides where the same-KB invariant is enforced, and with what.
+> The exporter writes `urn:kee:kb:A:fact:{id}` and asserts the id belongs to knowledge base A. Nothing in the schema made that true — a foreign key proves the row exists, not which base it lives in. A cross-KB `supersedes` would mint a local IRI naming a foreign fact; a cross-KB `type_id` would resolve to nothing and the statement would silently lose its class. This record decides where the same-KB invariant is enforced, and with what.
 
 ## The invariant
 
@@ -66,7 +66,7 @@ Forty reference edges are protected (thirty-nine at migration 0070; 0121 added `
 
 Same host (macOS, Darwin 25.4.0), same Postgres 16 (`pgvector/pgvector:pg16`), same toolchain (rustc 1.98.1), two fresh databases migrated by the respective build, alternating runs.
 
-`bench_100k` populate phase (`UTOPIA_BENCH_DOCS=1000`, `UTOPIA_BENCH_HUB_FACTS=1000`, ~1000 documents / ~3000 chunks / ~3000 facts written through the real store functions), three runs each, alternating patched/base:
+`bench_100k` populate phase (`KEE_BENCH_DOCS=1000`, `KEE_BENCH_HUB_FACTS=1000`, ~1000 documents / ~3000 chunks / ~3000 facts written through the real store functions), three runs each, alternating patched/base:
 
 | run | base | patched |
 |---|---|---|

@@ -12,7 +12,7 @@
 import { useSyncExternalStore } from "react";
 import { liveAnswer } from "./liveAnswer";
 
-const KEY = "utopia.unread";
+const KEY = "kee.unread";
 
 function load(): string[] {
   try {

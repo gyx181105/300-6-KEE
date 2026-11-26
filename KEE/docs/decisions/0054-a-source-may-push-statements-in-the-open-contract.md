@@ -11,7 +11,7 @@
 Four parts are reusable as they stand:
 
 - **A push interface with identity.** `POST /sources/{id}/ingest` on an `api` source: a per-source bearer key, an `external_id` that makes a second push an update in place with a version recorded, a tombstone, and a run row per call (`ingest_item_with_outcome`).
-- **The open contract and its parser.** `utopia_extract::open` defines the compact reply (`e` things, `s` statements, `n` names) and `parse_open_response` reads it without any reference to the model that produced it.
+- **The open contract and its parser.** `kee_extract::open` defines the compact reply (`e` things, `s` statements, `n` names) and `parse_open_response` reads it without any reference to the model that produced it.
 - **Everything after the parse.** `extraction_open::run_open` resolves names to entities, builds described things, records names as facts, writes each statement as an open fact with its evidence located in the chunk, keeps time words verbatim, hangs qualifiers on the edge, and counts what it dropped and why. None of it knows where the reply came from.
 - **A deterministic extractor for tables.** A table row is read as statements about its row's thing with the column heading as the phrase, with no model in the loop (#744).
 

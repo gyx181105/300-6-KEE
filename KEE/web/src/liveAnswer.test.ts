@@ -27,7 +27,7 @@ describe("citedSources", () => {
   });
 
   it("lists nothing when a greeting cites nothing it retrieved", () => {
-    const t = answer({ content: "你好！我是 Utopia 的知识助手。", sources: six });
+    const t = answer({ content: "你好！我是 KEE 的知识助手。", sources: six });
     expect(citedSources(t)).toEqual([]);
   });
 

@@ -14,7 +14,7 @@ export const DRAFT_KEY = "chat:draft";
  *  只记在 localStorage 不够：别的标签页换了人，共用的那份已经归了新人，这个标签页刷新时
  *  仍要认出自己的草稿是上一个人的。只记在 sessionStorage 也不行：新开的标签页是空的，
  *  同一个人每开一个标签页就要清一次未读和所选的库。 */
-const OWNER_KEY = "utopia.account";
+const OWNER_KEY = "kee.account";
 
 /** 这个标签页自己的：回答活得比页面长（liveAnswer），草稿和上次会话活得过刷新 */
 function clearTab() {

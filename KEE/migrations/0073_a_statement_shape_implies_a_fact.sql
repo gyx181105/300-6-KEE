@@ -27,7 +27,7 @@ CREATE TABLE implication_rules (
     object_type_id       UUID REFERENCES entity_types(id) ON DELETE CASCADE,
     object_is_value      BOOLEAN NOT NULL DEFAULT false,
     conclude_property_id UUID NOT NULL REFERENCES relation_types(id) ON DELETE CASCADE,
-    -- 空 = 宾语就是陈述的宾语；否则是读数的种类（见 utopia_extract::implication::READINGS）
+    -- 空 = 宾语就是陈述的宾语；否则是读数的种类（见 kee_extract::implication::READINGS）
     reading              TEXT,
     status               TEXT NOT NULL CHECK (status IN ('proposed', 'approved', 'rejected')),
     votes                JSONB,

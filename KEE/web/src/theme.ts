@@ -1,5 +1,5 @@
 /* 主题：暗 / 浅 / 跟系统。**默认暗**——那是这个界面的本色；浅色是给白天对着
- * 它看八小时的人的。存在浏览器里（`utopia.theme`），不经过后端：看的人自己定，
+ * 它看八小时的人的。存在浏览器里（`kee.theme`），不经过后端：看的人自己定，
  * 与语言同一个道理（0004）。
  *
  * 落在 `<html data-theme="dark|light">` 上，且**只落这两个值**：「system」在这里
@@ -10,7 +10,7 @@
 export type Theme = "system" | "light" | "dark";
 export type Resolved = "light" | "dark";
 
-const KEY = "utopia.theme";
+const KEY = "kee.theme";
 const listeners = new Set<(t: Resolved) => void>();
 
 function stored(): Theme {

@@ -6,7 +6,7 @@
 
 ## The problem
 
-Exposing Utopia's tools over MCP raises one question before transport: as whom does the
+Exposing KEE's tools over MCP raises one question before transport: as whom does the
 client connect? Neither existing credential fits. The JWT follows a person but is stateless,
 expires in seven days and cannot be revoked — a client configured in a file on someone else's
 machine would be reconfigured weekly, and a lost laptop waits for expiry.
@@ -24,7 +24,7 @@ push documents in.
 2. **Scope still narrows separately, because of the confused deputy.** An MCP client is
    someone else's agent under someone else's system prompt, reading untrusted content from the
    base — a document saying "run this SQL" or "remember X" may be obeyed with the person's
-   full permissions, and Utopia knows nothing about that client's prompt or its other servers.
+   full permissions, and KEE knows nothing about that client's prompt or its other servers.
    Full permission means read-only SQL against every production database mounted in every base
    the person can reach (`query_data`) and writes to the ledger (`remember`), all hanging off
    a string in `claude_desktop_config.json`. So the default token is read-only and limited to
@@ -33,7 +33,7 @@ push documents in.
 3. **This token is hashed while `ingest_token` is not.** `0002_ingest.sql` reasoned that once
    the database is lost the documents are lost anyway, so hashing buys nothing — true for a
    token that can only push documents in. A personal token reads production databases outside
-   Utopia through `query_data`, and that warehouse should not fall with Utopia's database.
+   KEE through `query_data`, and that warehouse should not fall with KEE's database.
    Different blast radius, different storage. SHA-256 rather than argon2: a high-entropy
    string does not fear brute force, and a per-row salt would defeat the `UNIQUE` index on
    `token_hash`.
@@ -55,7 +55,7 @@ push documents in.
    row (`mcp.tool_called`, target = the token), so attribution is real.
 
 6. **A write token may set up a base** (added 2026-10-15, #1243). A repository mirrored into
-   Utopia gets a base and a `statements` source; the push is the source key's job (0054), but
+   KEE gets a base and a `statements` source; the push is the source key's job (0054), but
    creating the base and the source took a session, so a backend either held someone's seven-day
    JWT or a person did it by hand for each repository. Five routes now also take a personal
    token with `write` scope, acting as its owner: creating a base in a workspace, creating a
@@ -143,9 +143,9 @@ push documents in.
   `chat.rs` into `tools.rs`, so chat and MCP share one implementation. The JSON schemas stay
   in `chat.rs`; `search_chunks` still says results can be cited as `[n]`, which MCP clients
   cannot see.
-- 2026-09-02: the placeholder crate `utopia-mcp` advertised three tools that never existed;
-  the server lives in `utopia-server/src/api/mcp.rs`. Deleted with `utopia-graph` and
-  `utopia-connectors` ([0016](0016-close-the-open-seams-before-cutting-new-ones.md) A2).
+- 2026-09-02: the placeholder crate `kee-mcp` advertised three tools that never existed;
+  the server lives in `kee-server/src/api/mcp.rs`. Deleted with `kee-graph` and
+  `kee-connectors` ([0016](0016-close-the-open-seams-before-cutting-new-ones.md) A2).
 
 - 2026-10-15: the status line still said `can_write` was hard-coded false. #318 had already
   computed it from the token's scope and the person's role, and `remember` has been reachable

@@ -6,9 +6,9 @@
 //   - 同一份文档跑几遍，每句话的结果一不一样；
 //   - token（服务端日志的 llm usage 行）。
 //
-//   BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d utopia_bench4 -tAc" \
+//   BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d kee_bench4 -tAc" \
 //   BENCH_SERVER_LOG=/path/to/server.log \
-//   node scripts/bench/timewords.mjs --db utopia_bench4 [--runs 3] [--out file.json]
+//   node scripts/bench/timewords.mjs --db kee_bench4 [--runs 3] [--out file.json]
 //
 // 每一遍建一个新库；不删任何东西。
 import fs from "node:fs";

@@ -180,4 +180,4 @@ must demonstrate:
   sync. GitHub replacements retain complete discussion content.
 
 Database assertions must run with PostgreSQL/pgvector and
-`UTOPIA_TEST_REQUIRE_DB=1`.
+`KEE_TEST_REQUIRE_DB=1`.

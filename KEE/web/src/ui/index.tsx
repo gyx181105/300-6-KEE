@@ -1,4 +1,4 @@
-/* Utopia UI 组件库 — 页面只用这里的组件与 styles.css 语义类，不写颜色字面量。
+/* KEE UI 组件库 — 页面只用这里的组件与 styles.css 语义类，不写颜色字面量。
    规矩在 web/DESIGN.md，守卫在 scripts/style-guard.mjs：字号五档、间距六档、
    圆角四档、颜色只认令牌、状态（hover/focus/disabled/动效）只在这里定。
    Dialog / DangerConfirm / Tooltip / Table / Field 各在自己的文件里，从这里再导出。 */
@@ -80,7 +80,7 @@ export function Wordmark({ className }: { className?: string }) {
       href={S.app.siteUrl}
       target="_blank"
       rel="noreferrer"
-      title="utopia.bi"
+      title="kee.bi"
       className={cn("relative inline-flex text-ink", className)}
       style={{ fontFamily: "var(--font-brand)", letterSpacing: "0.01em" }}
     >

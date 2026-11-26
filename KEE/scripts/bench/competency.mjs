@@ -2,7 +2,7 @@
 // competency bench（ADR 0061 决定 5）：把一个库接受了的能力问题按人在 chat 里问的方式问一遍，
 // 判答没答上，把结果写回问题（last_result），再读服务端算的两个数。
 //
-//   BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d utopia_bench4 -tAc" \
+//   BENCH_BASE=http://127.0.0.1:1524 BENCH_PSQL="docker exec ... -d kee_bench4 -tAc" \
 //   BENCH_JUDGE_BASE=... BENCH_JUDGE_KEY=... BENCH_JUDGE_MODEL=... \
 //   node scripts/bench/competency.mjs --kb <kb-id> [--seed truth/redocred-typed.questions.json] [--rejudge] [--only-report]
 //

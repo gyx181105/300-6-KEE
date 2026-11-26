@@ -33,7 +33,7 @@ and one never pushed are all 404 [0014 d7, 0052].
 
 **Another app can trade its user's fresh ID token for a session.** `POST /auth/oidc/exchange`
 accepts an ID token from the configured issuer whose audience is in
-`UTOPIA_OIDC_EXCHANGE_AUDIENCES` and that was issued in the last ten minutes, maps it only to an
+`KEE_OIDC_EXCHANGE_AUDIENCES` and that was issued in the last ten minutes, maps it only to an
 identity the person linked themselves, spends it once (`oidc_exchanges`) and audits
 `auth.oidc_exchange`; with no trusted audience the endpoint is a 404. Forced JWKS refreshes are at
 most one a minute per URL [0066].
@@ -64,12 +64,12 @@ removed or renamed only with a record [0020 revised].
   the other follows a source and never expires [0014].
 - **The confused deputy**: an MCP client runs under someone else's prompt over untrusted content, so
   the default token is read-only on one base and writing is ticked [0014].
-- **Different blast radius, different storage**: a personal token reaches warehouses outside Utopia,
+- **Different blast radius, different storage**: a personal token reaches warehouses outside KEE,
   so it is hashed while the ingest token is not [0014].
 - **Base-level machine tokens were refused** because attribution would become synthetic and a third
   authorisation model fails towards giving too much [0014].
 - **Every call checks scope** because list filtering guards only what is visible [0014].
-- **The calling app has its own client id** rather than Utopia's secret, and each ID token is spent
+- **The calling app has its own client id** rather than KEE's secret, and each ID token is spent
   once because the exchange has no `state` of its own [0066].
 - **The ledger records what people did; alerts record what the system did**, with different
   retention and readers [0005].

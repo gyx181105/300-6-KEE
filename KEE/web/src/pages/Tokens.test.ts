@@ -4,7 +4,7 @@ import { afterAll, expect, it, vi } from "vitest";
 import type { TokenView } from "../api";
 import { IssuedBody } from "./Tokens";
 
-vi.stubGlobal("window", { location: { origin: "https://utopia.test" } });
+vi.stubGlobal("window", { location: { origin: "https://kee.test" } });
 afterAll(() => vi.unstubAllGlobals());
 
 const kbs = [{ id: "general", name: "General" }, { id: "research", name: "Research" }];
@@ -21,5 +21,5 @@ it.each([
   const html = renderToStaticMarkup(createElement(IssuedBody, {
     token: "utp_pat_test", info: { ...info, kb_ids: allowed }, kbs, preferredKbId: "research",
   }));
-  expect(html).toContain(`https://utopia.test/api/v1/kbs/${expected}/mcp`);
+  expect(html).toContain(`https://kee.test/api/v1/kbs/${expected}/mcp`);
 });

@@ -1,0 +1,11 @@
+[package]
+name = "kee-search"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+tantivy.workspace = true
+tantivy-jieba.workspace = true
+anyhow.workspace = true
+tracing.workspace = true

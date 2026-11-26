@@ -81,11 +81,11 @@ function expectTabCleared() {
 
 function expectSharedCleared() {
   expect([...convMarks.unread()]).toEqual([]);
-  expect(localStorage.getItem("utopia.unread")).toBeNull();
+  expect(localStorage.getItem("kee.unread")).toBeNull();
   expect(wsStore.get()).toBeNull();
   expect(kbStore.get()).toBeNull();
-  expect(localStorage.getItem("utopia.ws")).toBeNull();
-  expect(localStorage.getItem("utopia.kb")).toBeNull();
+  expect(localStorage.getItem("kee.ws")).toBeNull();
+  expect(localStorage.getItem("kee.kb")).toBeNull();
 }
 
 beforeEach(() => {
@@ -115,8 +115,8 @@ describe("a tab keeps a person's chat state only for that person", () => {
     expectTabCleared();
     expectSharedCleared();
     expect(client.getQueryCache().getAll()).toEqual([]);
-    expect(sessionStorage.getItem("utopia.account")).toBeNull();
-    expect(localStorage.getItem("utopia.account")).toBeNull();
+    expect(sessionStorage.getItem("kee.account")).toBeNull();
+    expect(localStorage.getItem("kee.account")).toBeNull();
     expect(hooks.navigate).toHaveBeenCalledWith({ to: "/login" });
   });
 
@@ -141,7 +141,7 @@ describe("a tab keeps a person's chat state only for that person", () => {
   it("drops a tab's draft on reload after another account signed in in another tab", async () => {
     await seedPreviousAccount();
     // 另一个标签页里 B 登录：共用的那份已经归了 B
-    localStorage.setItem("utopia.account", "next-user");
+    localStorage.setItem("kee.account", "next-user");
     kbStore.set("next-users-kb");
     vi.spyOn(api, "me").mockResolvedValue({ id: "next-user" } as User);
     await fetchMe();

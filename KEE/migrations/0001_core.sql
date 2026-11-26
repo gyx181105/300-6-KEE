@@ -142,7 +142,7 @@ CREATE TABLE deployment_settings (
     default_model_concurrency INT NOT NULL DEFAULT 10,
     -- JWT 签名密钥。**首次启动自动生成**，于是「照 README 跑起来」和「安全」
     -- 不再是两件要分别做的事——默认值 dev-secret-change-me 上生产这类事故，
-    -- 靠提醒是防不住的。UTOPIA_JWT_SECRET 仍然优先于本列：轮换密钥、或者要
+    -- 靠提醒是防不住的。KEE_JWT_SECRET 仍然优先于本列：轮换密钥、或者要
     -- 多个实例显式对齐时填环境变量即可，那条路没有被关掉
     jwt_secret TEXT,
     -- 新库的 ontology_lang 缺省，含义见 knowledge_bases.ontology_lang

@@ -1,6 +1,6 @@
 -- 环违规按环定键，不按遍历的起点定键（#618）。
 --
--- `utopia_reason::cycles` 从 `adj` 的每个节点各走一遍，`left` 取这一次遍历的第一条
+-- `kee_reason::cycles` 从 `adj` 的每个节点各走一遍，`left` 取这一次遍历的第一条
 -- 边、`right` 取最后一条；而 `adj` 是 HashMap，起点顺序每次不同。量过：一个三元环、
 -- 同一份输入，`check()` 跑 200 次给出三种 `(left, right, path)`——三个旋转都来过。
 --
