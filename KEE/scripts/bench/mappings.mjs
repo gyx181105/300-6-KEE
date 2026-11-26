@@ -21,7 +21,7 @@
 //   node scripts/bench/mappings.mjs --kb <id> --score        # 只打分，不动库
 //
 // 环境变量：BENCH_BASE（默认 http://127.0.0.1:8322）、BENCH_EMAIL / BENCH_PASSWORD、
-//           BENCH_PSQL（默认 docker exec … psql -d kee -tAc）、
+//           BENCH_PSQL（默认 docker exec … psql -d utopia -tAc）、
 //           BENCH_CORPUS_CONN（服务端用来连语料库的连接串）。
 
 import fs from "node:fs";
@@ -37,7 +37,7 @@ const args = parseArgs(process.argv);
 const corpusName = args.corpus || "tpch";
 const truth = JSON.parse(fs.readFileSync(path.join(HERE, "truth", `${corpusName}.mappings.json`), "utf8"));
 const CORPUS_DB = process.env.BENCH_CORPUS_DB || `bench_${corpusName}`;
-const CORPUS_CONN = process.env.BENCH_CORPUS_CONN || `postgres://kee:kee@localhost:5432/${CORPUS_DB}`;
+const CORPUS_CONN = process.env.BENCH_CORPUS_CONN || `postgres://utopia:utopia@localhost:5432/${CORPUS_DB}`;
 const corpusPsql = (sql) => onDb(CORPUS_DB, `SET statement_timeout = '20s'; ${sql}`);
 
 // ---------- 语料 ----------
@@ -98,7 +98,7 @@ async function fresh() {
     const ex = (await api("GET", "/api/v1/admin/data-sources")).data_sources.find((d) => d.name === other);
     const dsOther = ex?.id
       ?? (await api("POST", "/api/v1/admin/data-sources", {
-        name: other, conn_string: process.env.BENCH_ALSO_CONN || `postgres://kee:kee@localhost:5432/bench_${other}`,
+        name: other, conn_string: process.env.BENCH_ALSO_CONN || `postgres://utopia:utopia@localhost:5432/bench_${other}`,
       })).id;
     await api("PUT", `/api/v1/admin/data-sources/${dsOther}/grants/${ws}`);
     const m2 = await api("PUT", `/api/v1/kbs/${kb}/data-sources/${dsOther}`);

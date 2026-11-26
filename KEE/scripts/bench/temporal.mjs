@@ -65,7 +65,7 @@ async function api(method, url, body) {
 function psql(sql) {
   const cmd =
     process.env.BENCH_PSQL ||
-    "docker exec -e PGPASSWORD=kee landscapebi-db-1 psql -U kee -d kee -tAc";
+    "docker exec -e PGPASSWORD=utopia landscapebi-db-1 psql -U utopia -d utopia -tAc";
   return execSync(`${cmd} "${sql.replace(/"/g, '\\"')}"`, { encoding: "utf8" }).trim();
 }
 const num = (sql) => Number(psql(sql) || 0);

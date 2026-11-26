@@ -91,7 +91,7 @@ fn explain_db_error(e: anyhow::Error) -> anyhow::Error {
             "The database rejected the password. In a docker compose deployment the password \
              is set only when the data volume is first initialised, so changing KEE_DB_PASSWORD \
              later only changes what the app sends. Either set it in the database too — \
-             docker compose exec db psql -U kee -c \"ALTER USER kee PASSWORD '<new password>'\" \
+             docker compose exec db psql -U utopia -c \"ALTER USER utopia PASSWORD '<new password>'\" \
              — or start over with `docker compose --profile app down -v` (this deletes all data).",
         )
     } else {

@@ -11,14 +11,14 @@ PORT="${E2E_PORT:-8317}"
 DATA_DIR="$(mktemp -d)"
 
 echo "--- 重建隔离数据库 $DB_NAME"
-docker exec "$DB_CONTAINER" psql -U kee -d postgres \
+docker exec "$DB_CONTAINER" psql -U utopia -d postgres \
   -c "DROP DATABASE IF EXISTS $DB_NAME;" -c "CREATE DATABASE $DB_NAME;" >/dev/null
 
 echo "--- 构建 kee-server"
 cargo build -p kee-server
 
 echo "--- 启动 server (127.0.0.1:$PORT, db=$DB_NAME)"
-KEE_DATABASE_URL="postgres://kee:kee@localhost:1517/$DB_NAME" \
+KEE_DATABASE_URL="postgres://utopia:utopia@localhost:1517/$DB_NAME" \
 KEE_BIND_ADDR="127.0.0.1:$PORT" \
 KEE_DATA_DIR="$DATA_DIR" \
   ./target/debug/kee-server &

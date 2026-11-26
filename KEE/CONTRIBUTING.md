@@ -84,7 +84,7 @@ If you touched SQL under `crates/kee-store/`, set it and run again:
 # so a locally installed Postgres does not collide with the dev container.
 # Inside the compose network the app still talks to db:5432; 1517 is only
 # for code on the host reaching the container.
-export KEE_DATABASE_URL=postgres://kee:kee@localhost:1517/kee
+export KEE_DATABASE_URL=postgres://utopia:utopia@localhost:1517/utopia
 cargo test --workspace
 ```
 

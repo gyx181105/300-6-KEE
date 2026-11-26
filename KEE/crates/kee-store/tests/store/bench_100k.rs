@@ -7,7 +7,7 @@
 //! ## Running
 //!
 //! ```text
-//! KEE_DATABASE_URL=postgres://kee:kee@127.0.0.1:1517/kee \
+//! KEE_DATABASE_URL=postgres://utopia:utopia@127.0.0.1:1517/utopia \
 //!     KEE_BENCH=1 \
 //!     cargo test -p kee-store --test bench_100k -- --nocapture
 //! ```

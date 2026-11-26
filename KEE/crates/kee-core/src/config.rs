@@ -55,7 +55,7 @@ pub struct AppConfig {
 impl Default for AppConfig {
     fn default() -> Self {
         Self {
-            database_url: "postgres://kee:kee@localhost:1517/kee".into(),
+            database_url: "postgres://utopia:utopia@localhost:1517/utopia".into(),
             migration_url: None,
             bind_addr: "0.0.0.0:1516".into(),
             jwt_secret: None,
@@ -129,7 +129,7 @@ mod tests {
     #[test]
     fn a_blank_migration_url_falls_back_to_the_database_url() {
         Jail::expect_with(|jail| {
-            jail.set_env("KEE_DATABASE_URL", "postgres://u:p@db:5432/kee");
+            jail.set_env("KEE_DATABASE_URL", "postgres://u:p@db:5432/utopia");
             jail.set_env("KEE_MIGRATION_URL", "");
             let cfg = AppConfig::load().unwrap();
             assert_eq!(cfg.migration_url, None, "空串要当作没设");
@@ -142,7 +142,7 @@ mod tests {
     #[test]
     fn whitespace_counts_as_blank() {
         Jail::expect_with(|jail| {
-            jail.set_env("KEE_DATABASE_URL", "postgres://u:p@db:5432/kee");
+            jail.set_env("KEE_DATABASE_URL", "postgres://u:p@db:5432/utopia");
             jail.set_env("KEE_MIGRATION_URL", "   ");
             let cfg = AppConfig::load().unwrap();
             assert_eq!(cfg.migration_url, None);
@@ -154,12 +154,12 @@ mod tests {
     #[test]
     fn a_migration_url_that_is_set_still_wins() {
         Jail::expect_with(|jail| {
-            jail.set_env("KEE_DATABASE_URL", "postgres://app:p@db:5432/kee");
-            jail.set_env("KEE_MIGRATION_URL", "postgres://owner:p@db:5432/kee");
+            jail.set_env("KEE_DATABASE_URL", "postgres://app:p@db:5432/utopia");
+            jail.set_env("KEE_MIGRATION_URL", "postgres://owner:p@db:5432/utopia");
             let cfg = AppConfig::load().unwrap();
             assert_eq!(
                 cfg.migration_url.as_deref(),
-                Some("postgres://owner:p@db:5432/kee")
+                Some("postgres://owner:p@db:5432/utopia")
             );
             assert_ne!(cfg.migration_url(), cfg.database_url);
             Ok(())

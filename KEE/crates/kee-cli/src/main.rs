@@ -1017,8 +1017,8 @@ mod tests {
 
     #[test]
     fn redact_url_host_keeps_userinfo_at_host() {
-        let r = redact_url_host("postgres://kee:secret@db:5432/kee");
-        assert_eq!(r, "postgres://***@db:5432/kee");
+        let r = redact_url_host("postgres://utopia:secret@db:5432/utopia");
+        assert_eq!(r, "postgres://***@db:5432/utopia");
     }
 
     #[test]

@@ -6,9 +6,9 @@ services:
     # This raises the limit; memory is allocated only as it is used.
     shm_size: 1g
     environment:
-      POSTGRES_USER: kee
-      POSTGRES_PASSWORD: ${KEE_DB_PASSWORD:-kee}
-      POSTGRES_DB: kee
+      POSTGRES_USER: utopia
+      POSTGRES_PASSWORD: ${KEE_DB_PASSWORD:-utopia}
+      POSTGRES_DB: utopia
       # 应用运行时用的受限角色口令。设了才建角色，不设则应用仍以 owner 身份跑。
       #
       # **这一条故意保留 `${VAR:-}` 写法**，与下面 app 服务里那三条只写键名的
@@ -31,7 +31,7 @@ services:
       # （见 README 的升级说明）。权限由迁移 0031 授予，不在这里给。
       - ./docker/init-app-role.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kee -d kee"]
+      test: ["CMD-SHELL", "pg_isready -U utopia -d utopia"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -52,7 +52,7 @@ services:
       # 默认以 owner 身份运行。要启用受限角色（业务表随便读写、台账只增不改），
       # 在 .env 里同时给出这两条——见 .env.example。分开写而不做条件拼接，
       # 是因为那种嵌套替换没人读得懂，出错了也查不出来。
-      KEE_DATABASE_URL: ${KEE_DATABASE_URL:-postgres://kee:${KEE_DB_PASSWORD:-kee}@db:5432/kee}
+      KEE_DATABASE_URL: ${KEE_DATABASE_URL:-postgres://utopia:${KEE_DB_PASSWORD:-utopia}@db:5432/utopia}
       # 下面三条**只写键名不写值**：这样变量没设时容器里就没有这个变量，而
       # `${VAR:-}` 传进去的是空串。两者对应用不是一回事——空串会盖掉默认值，
       # 而「盖掉默认值」正是 rc5 起不来的原因（#343）：迁移连接串拿到空串，

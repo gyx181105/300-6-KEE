@@ -258,7 +258,7 @@ SQL 的空字段（psql 默认显示的 NULL、空字符串）与纯空白不参
 
 ```bash
 node --test scripts/bench/lib.test.mjs
-BENCH_TEST_PSQL="psql -X -h 127.0.0.1 -p 1517 -U kee -tAc" BENCH_TEST_DB=kee PGPASSWORD=kee \
+BENCH_TEST_PSQL="psql -X -h 127.0.0.1 -p 1517 -U utopia -tAc" BENCH_TEST_DB=utopia PGPASSWORD=utopia \
   node --test scripts/bench/lib.pg.test.mjs
 ```
 

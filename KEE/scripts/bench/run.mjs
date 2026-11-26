@@ -65,7 +65,7 @@ async function api(method, url, body, isForm) {
 function psql(sql) {
   const cmd =
     process.env.BENCH_PSQL ||
-    "docker exec -e PGPASSWORD=kee landscapebi-db-1 psql -U kee -d kee -tAc";
+    "docker exec -e PGPASSWORD=utopia landscapebi-db-1 psql -U utopia -d utopia -tAc";
   const parts = cmd.split(" ");
   return execFileSync(parts[0], [...parts.slice(1), sql], { encoding: "utf8" }).trim();
 }

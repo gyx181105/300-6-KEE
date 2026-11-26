@@ -14,27 +14,27 @@
 -- 报错中断迁移，那将让每一个既有部署升级即失败。
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'kee_app') THEN
-        RAISE NOTICE 'kee_app 角色不存在，跳过受限权限配置（应用继续以当前身份运行）';
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'utopia_app') THEN
+        RAISE NOTICE 'utopia_app 角色不存在，跳过受限权限配置（应用继续以当前身份运行）';
         RETURN;
     END IF;
 
-    GRANT USAGE ON SCHEMA public TO kee_app;
-    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO kee_app;
-    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO kee_app;
-    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO kee_app;
+    GRANT USAGE ON SCHEMA public TO utopia_app;
+    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO utopia_app;
+    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO utopia_app;
+    GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO utopia_app;
 
     -- 台账：写得进、读得到，改不动、删不掉
-    REVOKE UPDATE, DELETE, TRUNCATE ON audit_events FROM kee_app;
+    REVOKE UPDATE, DELETE, TRUNCATE ON audit_events FROM utopia_app;
 
     -- 往后迁移新建的表/序列/函数自动授权，否则每加一张表应用就撞权限错误。
     -- PL/pgSQL 不接受这条 utility 命令的直写形式，走 EXECUTE。
     EXECUTE 'ALTER DEFAULT PRIVILEGES IN SCHEMA public '
-         || 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO kee_app';
+         || 'GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO utopia_app';
     EXECUTE 'ALTER DEFAULT PRIVILEGES IN SCHEMA public '
-         || 'GRANT USAGE, SELECT ON SEQUENCES TO kee_app';
+         || 'GRANT USAGE, SELECT ON SEQUENCES TO utopia_app';
     EXECUTE 'ALTER DEFAULT PRIVILEGES IN SCHEMA public '
-         || 'GRANT EXECUTE ON FUNCTIONS TO kee_app';
+         || 'GRANT EXECUTE ON FUNCTIONS TO utopia_app';
 
-    RAISE NOTICE 'kee_app 受限权限已配置';
+    RAISE NOTICE 'utopia_app 受限权限已配置';
 END $$;

@@ -40,7 +40,7 @@ const args = parseArgs(process.argv);
 const CORPUS = args.corpus || "redocred-100";
 const LABEL = args.label || "typed";
 const OUT = args.out || path.join(process.env.TMPDIR || "/tmp", `typed-${LABEL}.json`);
-const PSQL = process.env.BENCH_PSQL || "docker exec -e PGPASSWORD=kee kee-db-1 psql -U kee -d kee -tAc";
+const PSQL = process.env.BENCH_PSQL || "docker exec -e PGPASSWORD=utopia kee-db-1 psql -U utopia -d utopia -tAc";
 const psql = (sql) => {
   const parts = PSQL.split(" ");
   return execFileSync(parts[0], [...parts.slice(1), sql], { encoding: "utf8", maxBuffer: 256 << 20, stdio: ["ignore", "pipe", "pipe"] }).trim();

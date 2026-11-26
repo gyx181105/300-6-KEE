@@ -82,7 +82,7 @@ let Ok(url) = std::env::var("KEE_DATABASE_URL") else {
 # 1517 是宿主机侧端口：docker-compose.yml 显式避开 5432，以免和本地已经
 # 跑着的 PG 撞上。容器内仍是 5432，app 在 compose 网络里走 db:5432；
 # 这条 1517 只给宿主机上跑的代码连容器用。
-export KEE_DATABASE_URL=postgres://kee:kee@localhost:1517/kee
+export KEE_DATABASE_URL=postgres://utopia:utopia@localhost:1517/utopia
 cargo run -p kee-store --example migrate   # 空库先迁移；CI 的 backend job 也是这么做的
 cargo test --workspace
 ```
