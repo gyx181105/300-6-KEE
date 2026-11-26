@@ -29,6 +29,7 @@ export const STREAM_STALE_MS = 30_000;
 /** 事件流会失效的键头（见 `useKbEvents`）；切库时也按这张表失效目标库 */
 export const STREAM_KEYS = [
   "documents",
+  "docDetail",
   "graph",
   "review",
   "pending",

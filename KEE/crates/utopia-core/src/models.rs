@@ -102,11 +102,14 @@ pub struct Document {
     /// 服务端边抽取边填；`time_context_at` 是最近一次写下它的时刻
     pub time_context: Option<serde_json::Value>,
     pub time_context_at: Option<DateTime<Utc>>,
-    /// 图谱抽取状态：none → queued → extracting → done | failed
+    /// 图谱抽取状态：none → queued → extracting → done | failed | paused
     pub graph_status: String,
     /// 抽取失败原因（失败时才有）。与 error 分列——那列归解析管道，
     /// set_status 会清空它，两者共用一列会互相抹掉。
     pub graph_error: Option<String>,
+    /// 本轮图谱抽取开始时刻（入队时写入；暂停/继续保留；停止或重新全量排队重写）。
+    /// 文库行内进度用它续算「已用时长」，避免刷新后从 0 起跳。
+    pub graph_started_at: Option<DateTime<Utc>>,
     pub text_len: i32,
     pub chunk_count: i32,
     pub tags: Vec<String>,
@@ -1754,13 +1757,22 @@ pub struct RelationAxioms {
     pub sub_property_of: Option<Uuid>,
 }
 
+/// 文库列表里的一篇文档：本体字段 + 图谱抽取进度（已抽分块数）。
+#[derive(Debug, Clone, Serialize)]
+pub struct DocumentListItem {
+    #[serde(flatten)]
+    pub document: Document,
+    /// 活分块里已打上 `extracted_at` 的数量。进度条分子；分母是 `chunk_count`
+    pub extracted_chunks: i64,
+}
+
 /// 文库的一页，连同这一页之外的统计。
 ///
 /// **统计不受名字/状态筛选影响**：`ready` / `done` / `extracting` / `failed` 说的是
 /// 这个来源里有多少，那是批量按钮的作用范围，跟你此刻在搜什么无关。
 #[derive(Debug, Clone, Serialize)]
 pub struct DocumentPage {
-    pub docs: Vec<Document>,
+    pub docs: Vec<DocumentListItem>,
     /// 命中筛选的总数（分页器用它）
     pub total: i64,
     /// 摄入完成（`status = 'ready'`）的篇数：重抽的作用范围

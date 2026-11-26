@@ -80,6 +80,8 @@ export function useKbEvents(kbId: string | undefined) {
       {
         document: () => {
           push(["documents", kbId]);
+          // 文档详情的处理时间线也要跟着 status / graph_status 走
+          push(["docDetail"]);
           pushGraph();
         },
         graph: () => {

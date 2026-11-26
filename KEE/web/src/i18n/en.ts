@@ -567,6 +567,7 @@ export const en = {
     statusDone: "Extracted",
     statusQueued: "Queued",
     statusExtracting: "Extracting",
+    statusPaused: "Paused",
     statusNone: "Not extracted",
     retryFailed: (n: number) => `Retry ${n} failed`,
     retryQueued: (n: number) => `${n} queued for extraction`,
@@ -583,6 +584,37 @@ export const en = {
     // 抽取进度（当前视图内聚合，SSE 推动刷新）
     extractProgress: (done: number, total: number) =>
       `Extracting · ${done} / ${total}`,
+    /** 文库右下角：处理活动面板（status / graph_status 驱动） */
+    process: {
+      title: "Processing",
+      summary: (working: number, queued: number, failed: number) =>
+        `Working ${working} · Queued ${queued} · Failed ${failed}`,
+      collapse: "Collapse",
+      expand: "Expand",
+      dismiss: "Dismiss",
+      chunks: (n: number) => `${n} chunks`,
+      /** Graph extraction: finished chunks / total chunks */
+      chunksProgress: (done: number, total: number) =>
+        `${done} / ${total} chunks extracted`,
+      steps: {
+        pending: "Queued",
+        parsing: "Parsing",
+        indexing: "Indexing",
+        embedding: "Embedding",
+        ready: "Ready",
+        extracting: "Extracting",
+        done: "Done",
+      },
+      logPending: "Queued for ingestion",
+      logParsing: (size: string) => `Parsing · ${size}`,
+      logIndexing: "Building sections",
+      logIndexed: (n: number) => `Sections ready · ${n} chunks`,
+      logEmbedding: "Writing vectors",
+      logReady: "Ingestion ready",
+      logGraphQueued: "Queued for graph extraction",
+      logExtracting: "Extracting graph",
+      logDone: "Complete",
+    },
     // 失败详情：chip 可点开，不再只有 tooltip
     errorTitle: "Failure details",
     errorParse: "Ingestion pipeline",
@@ -639,10 +671,17 @@ export const en = {
       none: "—",
       queued: "Queued",
       extracting: "Extracting",
+      paused: "Paused",
       done: "Done",
       failed: "Failed",
       skipped: "Not extracted",
     },
+    processPause: "Pause",
+    processResume: "Resume",
+    processStop: "Stop",
+    processPaused: "Paused",
+    processStopped: "Extraction stopped",
+    processResumed: "Extraction resumed",
     sources: "Sources",
     allDocs: "All documents",
     uploads: "Uploads",
@@ -1248,6 +1287,11 @@ export const en = {
     docDate: "Document date",
     docDateFromContent: "Detected from the filename or first line",
     uploadedAt: "Uploaded",
+    process: {
+      title: "Processing",
+      log: "Session log",
+      liveHint: "Status updates as the pipeline advances.",
+    },
   },
   settings: {
     title: "Administration",

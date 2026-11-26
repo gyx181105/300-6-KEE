@@ -1167,6 +1167,8 @@ pub(crate) async fn run_open(
             &mut touched_names,
         )
         .await?;
+        // 每抽完一块推一次：前端进度要显示「已抽 x / 总块」
+        state.emit_document(kb_id, document_id);
     }
 
     // 消歧后缀在实体创建时算会早于其事实写入——收尾时对本文档涉及的名字统一刷新

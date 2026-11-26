@@ -13,6 +13,8 @@ import {
   X,
 } from "lucide-react";
 import { api, type Doc, type ExtractionDrop, type SourceView } from "../api";
+import { ProcessRowProgress } from "../components/ProcessRowProgress";
+import { buildProcessStepperItems } from "../components/ProcessStepper";
 import { S } from "../i18n";
 import {
   CREATABLE_SOURCE_KINDS,
@@ -20,6 +22,15 @@ import {
   type CreatableSourceKind,
 } from "../sourceKinds";
 import { useKb, useKbId } from "../kb";
+import {
+  canControlExtraction,
+  chunksProgressMeta,
+  isBusy,
+  isFailed,
+  observeDocs,
+  resolveFirstAt,
+  useProcessTrack,
+} from "../processLog";
 import { toast } from "../toast";
 import { copyAndSay } from "../clipboard";
 import { pushEndpoint } from "../pushEndpoint";
@@ -339,7 +350,8 @@ export function Library() {
   // 过滤词变化回到第一页
   useEffect(() => setPage(0), [filter]);
 
-  // 状态变化经 SSE 事件流推送（useKbEvents 挂在 Shell），无需轮询
+  // 状态变化经 SSE 推送；忙着抽时再加短轮询——块进度只涨 extracted_chunks，
+  // 事件风暴时 SSE 可能 Lagged 断流，轮询兜住「已抽 x/y」自己往前走
   const docs = useQuery({
     // **服务端筛选与分页**：作用域、名字、抽取状态、页码都进 queryKey，
     // 换任何一个都重新取一页。从前是一次取回整库、客户端切片
@@ -360,6 +372,10 @@ export function Library() {
       }),
     enabled: !!kb,
     placeholderData: (prev) => prev,
+    refetchInterval: (q) =>
+      q.state.data?.docs?.some((d) => isBusy(d.status, d.graph_status))
+        ? 2_000
+        : false,
   });
   const sources = useQuery({
     queryKey: ["sources", kb?.id],
@@ -381,6 +397,51 @@ export function Library() {
     }
     return m;
   }, [drops.data]);
+
+  // 行内进度要看见翻页之外的忙文档：按图谱状态各取一页
+  const busyExtracting = useQuery({
+    queryKey: ["documents", kb?.id, "process", "extracting"],
+    queryFn: () =>
+      api.documents(kb!.id, { graph: "extracting", limit: 50, offset: 0 }),
+    enabled: !!kb,
+    refetchInterval: (q) => ((q.state.data?.docs?.length ?? 0) > 0 ? 2_000 : false),
+  });
+  const busyQueued = useQuery({
+    queryKey: ["documents", kb?.id, "process", "queued"],
+    queryFn: () =>
+      api.documents(kb!.id, { graph: "queued", limit: 50, offset: 0 }),
+    enabled: !!kb,
+    refetchInterval: (q) => ((q.state.data?.docs?.length ?? 0) > 0 ? 2_000 : false),
+  });
+  const busyPaused = useQuery({
+    queryKey: ["documents", kb?.id, "process", "paused"],
+    queryFn: () =>
+      api.documents(kb!.id, { graph: "paused", limit: 50, offset: 0 }),
+    enabled: !!kb,
+  });
+  const busyFailed = useQuery({
+    queryKey: ["documents", kb?.id, "process", "failed"],
+    queryFn: () =>
+      api.documents(kb!.id, { graph: "failed", limit: 30, offset: 0 }),
+    enabled: !!kb,
+  });
+
+  // SSE 刷新列表后，把看见的文档记进 processLog
+  useEffect(() => {
+    if (docs.data?.docs) observeDocs(docs.data.docs);
+  }, [docs.data]);
+  useEffect(() => {
+    if (busyExtracting.data?.docs) observeDocs(busyExtracting.data.docs);
+  }, [busyExtracting.data]);
+  useEffect(() => {
+    if (busyQueued.data?.docs) observeDocs(busyQueued.data.docs);
+  }, [busyQueued.data]);
+  useEffect(() => {
+    if (busyPaused.data?.docs) observeDocs(busyPaused.data.docs);
+  }, [busyPaused.data]);
+  useEffect(() => {
+    if (busyFailed.data?.docs) observeDocs(busyFailed.data.docs);
+  }, [busyFailed.data]);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["documents", kb?.id] });
@@ -417,7 +478,10 @@ export function Library() {
       );
       return api.upload(kb!.id, Array.from(files), folder?.id);
     },
-    onSuccess: invalidate,
+    onSuccess: (r) => {
+      if (r.created?.length) observeDocs(r.created);
+      invalidate();
+    },
   });
   // 删除是墓碑（#268）：提示里给一个「撤销」，点了原路复活
   const restore = useMutation({
@@ -453,6 +517,30 @@ export function Library() {
   const reprocess = useMutation({
     mutationFn: (id: string) => api.reprocessDocument(id),
     onSuccess: invalidate,
+  });
+  const pauseExtraction = useMutation({
+    mutationFn: (id: string) => api.pauseExtraction(id),
+    onSuccess: () => {
+      toast.success(S.library.processPaused);
+      invalidate();
+    },
+    onError: (e) => toast.error(String(e)),
+  });
+  const resumeExtraction = useMutation({
+    mutationFn: (id: string) => api.resumeExtraction(id),
+    onSuccess: () => {
+      toast.success(S.library.processResumed);
+      invalidate();
+    },
+    onError: (e) => toast.error(String(e)),
+  });
+  const stopExtraction = useMutation({
+    mutationFn: (id: string) => api.stopExtraction(id),
+    onSuccess: () => {
+      toast.success(S.library.processStopped);
+      invalidate();
+    },
+    onError: (e) => toast.error(String(e)),
   });
   // 本库角色：门控"重建图谱"入口（KB admin 起步，与 API 端一致）
   const kbDetail = useQuery({
@@ -612,6 +700,7 @@ export function Library() {
                     { value: "done", label: S.library.statusDone },
                     { value: "queued", label: S.library.statusQueued },
                     { value: "extracting", label: S.library.statusExtracting },
+                    { value: "paused", label: S.library.statusPaused },
                     { value: "none", label: S.library.statusNone },
                   ]}
                 />
@@ -758,6 +847,9 @@ export function Library() {
                       onDelete={() => remove.mutate(d.id)}
                       onExtract={() => extract.mutate(d.id)}
                       onReprocess={() => reprocess.mutate(d.id)}
+                      onPause={() => pauseExtraction.mutate(d.id)}
+                      onResume={() => resumeExtraction.mutate(d.id)}
+                      onStop={() => stopExtraction.mutate(d.id)}
                       onShowError={(kind, text) =>
                         setErrorView({ file: d.filename, kind, text })
                       }
@@ -2315,6 +2407,9 @@ function DocRow({
   onDelete,
   onExtract,
   onReprocess,
+  onPause,
+  onResume,
+  onStop,
   onShowError,
   drops,
   onShowDrops,
@@ -2325,12 +2420,20 @@ function DocRow({
   onDelete: () => void;
   onExtract: () => void;
   onReprocess: () => void;
+  onPause: () => void;
+  onResume: () => void;
+  onStop: () => void;
   onShowError: (kind: string, text: string) => void;
   /** 这篇文档抽出来却没落地的事实；undefined = 一条都没有 */
   drops?: ExtractionDrop[];
   onShowDrops: (rows: ExtractionDrop[]) => void;
 }) {
   const kbId = useKbId();
+  const track = useProcessTrack(doc.id);
+  const busy = isBusy(doc.status, doc.graph_status);
+  const failed = isFailed(doc.status, doc.graph_status);
+  const paused = doc.graph_status === "paused";
+  const now = useTickingNow(busy && !failed && !paused);
   const dropTotal = drops?.reduce((n, d) => n + d.count, 0) ?? 0;
   const statusText =
     S.library.status[doc.status as keyof typeof S.library.status] ?? doc.status;
@@ -2338,6 +2441,28 @@ function DocRow({
     S.library.graphStatus[doc.graph_status as keyof typeof S.library.graphStatus] ??
     doc.graph_status;
   const SrcIcon = source ? sourceIcon(source) : Upload;
+  const steps = buildProcessStepperItems({
+    status: doc.status,
+    graphStatus: doc.graph_status,
+    labels: S.library.process.steps,
+    skippedLabel: S.library.graphStatus.skipped,
+    lines: track?.lines,
+    firstAt: track?.firstAt,
+    completedAt: track?.completedAt,
+    now,
+  });
+  // 块进度以列表里的 doc 为准（SSE/轮询最新值）；track 只补会话时长与步骤点
+  const extracted = doc.extracted_chunks ?? track?.snap.extracted_chunks ?? 0;
+  const meta = chunksProgressMeta(
+    doc.chunk_count,
+    extracted,
+    doc.graph_status,
+    S.library.process.chunksProgress,
+  );
+  const firstAt = resolveFirstAt(doc.graph_started_at, track?.firstAt, now);
+  const elapsedMs = busy || track ? (track?.completedAt ?? now) - firstAt : undefined;
+  const controllable = canControlExtraction(doc.graph_status);
+
   return (
     <tr className="border-b border-line">
       <td className="px-4 py-3 max-w-xs truncate" title={doc.filename}>
@@ -2358,53 +2483,73 @@ function DocRow({
           </span>
         </td>
       )}
-      <td className="px-4 py-3">
-        {/* 失败可点开看原文：tooltip 会截断、也没法复制 */}
-        <StatusCell
-          danger={doc.status === "failed"}
-          onClick={
-            doc.status === "failed" && doc.error
-              ? () => onShowError(S.library.errorParse, doc.error!)
-              : undefined
-          }
-        >
-          {statusText}
-        </StatusCell>
-        {doc.missing_since && (
-          <span
-            className="ml-3 text-small text-ink-2"
-            title={doc.missing_since.slice(0, 16).replace("T", " ")}
-          >
-            {S.library.notInSource}
-          </span>
-        )}
-      </td>
-      <td className="px-4 py-3">
-        <StatusCell
-          danger={doc.graph_status === "failed"}
-          onClick={
-            doc.graph_status === "failed" && doc.graph_error
-              ? () => onShowError(S.library.errorGraph, doc.graph_error!)
-              : undefined
-          }
-        >
-          {graphText}
-        </StatusCell>
-        {/* 抽出来却没落地的事实。抽取成功不代表全须全尾，所以它与 graph_status
-            并列而不是替代它——"done" 和 "3 dropped" 同时为真。
-            **不给警示色**：漏掉的事实不是故障，是窄本体本来就会做的事；
-            琥珀挨着红色，会让人以为一行里坏了两件事。它只是个值得点开看看的数 */}
-        {dropTotal > 0 && drops && (
-          /* 带下划线但不提亮：它是可以点开看的，可它不该比旁边的状态更响 */
-          <LinkButton
-            underline
-            className="ml-3 text-ink-2"
-            onClick={() => onShowDrops(drops)}
-          >
-            {S.library.dropsChip(dropTotal)}
-          </LinkButton>
-        )}
-      </td>
+      {busy ? (
+        <td className="px-4 py-3 min-w-80" colSpan={2}>
+          <ProcessRowProgress
+            steps={steps}
+            meta={meta}
+            elapsedMs={elapsedMs}
+            paused={paused}
+            onPause={controllable ? onPause : undefined}
+            onResume={controllable ? onResume : undefined}
+            onStop={controllable ? onStop : undefined}
+            pauseLabel={S.library.processPause}
+            resumeLabel={S.library.processResume}
+            stopLabel={S.library.processStop}
+            pausedLabel={S.library.processPaused}
+          />
+        </td>
+      ) : (
+        <>
+          <td className="px-4 py-3">
+            {/* 失败可点开看原文：tooltip 会截断、也没法复制 */}
+            <StatusCell
+              danger={doc.status === "failed"}
+              onClick={
+                doc.status === "failed" && doc.error
+                  ? () => onShowError(S.library.errorParse, doc.error!)
+                  : undefined
+              }
+            >
+              {statusText}
+            </StatusCell>
+            {doc.missing_since && (
+              <span
+                className="ml-3 text-small text-ink-2"
+                title={doc.missing_since.slice(0, 16).replace("T", " ")}
+              >
+                {S.library.notInSource}
+              </span>
+            )}
+          </td>
+          <td className="px-4 py-3">
+            <StatusCell
+              danger={doc.graph_status === "failed"}
+              onClick={
+                doc.graph_status === "failed" && doc.graph_error
+                  ? () => onShowError(S.library.errorGraph, doc.graph_error!)
+                  : undefined
+              }
+            >
+              {graphText}
+            </StatusCell>
+            {/* 抽出来却没落地的事实。抽取成功不代表全须全尾，所以它与 graph_status
+                并列而不是替代它——"done" 和 "3 dropped" 同时为真。
+                **不给警示色**：漏掉的事实不是故障，是窄本体本来就会做的事；
+                琥珀挨着红色，会让人以为一行里坏了两件事。它只是个值得点开看看的数 */}
+            {dropTotal > 0 && drops && (
+              /* 带下划线但不提亮：它是可以点开看的，可它不该比旁边的状态更响 */
+              <LinkButton
+                underline
+                className="ml-3 text-ink-2"
+                onClick={() => onShowDrops(drops)}
+              >
+                {S.library.dropsChip(dropTotal)}
+              </LinkButton>
+            )}
+          </td>
+        </>
+      )}
       <td className="px-4 py-3 text-ink-2">{doc.chunk_count || "—"}</td>
       <td className="px-4 py-3 text-ink-2">{formatSize(doc.size_bytes)}</td>
       {/* 动作自成一列。徽章说的是这一行现在是什么状态，动作说的是能拿它怎么办；
@@ -2440,6 +2585,17 @@ function DocRow({
       </td>
     </tr>
   );
+}
+
+function useTickingNow(active: boolean): number {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!active) return;
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 1_000);
+    return () => clearInterval(id);
+  }, [active]);
+  return active ? now : Date.now();
 }
 
 function formatSize(bytes: number): string {

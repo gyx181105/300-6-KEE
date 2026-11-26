@@ -443,7 +443,14 @@ pub async fn detail(
     let doc = utopia_store::documents::get(&state.pool, id).await?;
     utopia_store::access::require_kb(&state.pool, &user, doc.kb_id, Role::Viewer).await?;
     let chunks = utopia_store::documents::chunks_full(&state.pool, id).await?;
-    Ok(Json(json!({ "document": doc, "chunks": chunks })))
+    let extracted_chunks =
+        utopia_store::documents::extracted_chunk_count(&state.pool, id).await?;
+    // 与列表同形：Document 字段摊平，外加抽取进度分子
+    let mut document = serde_json::to_value(&doc).map_err(anyhow::Error::from)?;
+    if let Some(obj) = document.as_object_mut() {
+        obj.insert("extracted_chunks".into(), json!(extracted_chunks));
+    }
+    Ok(Json(json!({ "document": document, "chunks": chunks })))
 }
 
 /// 反向证据链：文档各分块抽出的事实（文档查看器右栏）。
@@ -605,6 +612,45 @@ pub async fn reprocess(
     )
     .await?;
     Ok(Json(json!({ "job_id": job_id })))
+}
+
+/// 暂停图谱抽取（保留已抽分块）。
+pub async fn pause_extraction(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    Path(id): Path<Uuid>,
+) -> ApiResult<Json<serde_json::Value>> {
+    let doc = utopia_store::documents::get(&state.pool, id).await?;
+    utopia_store::access::require_kb(&state.pool, &user, doc.kb_id, Role::Editor).await?;
+    utopia_store::documents::pause_extraction(&state.pool, id).await?;
+    state.emit_document(doc.kb_id, id);
+    Ok(Json(json!({ "ok": true, "graph_status": "paused" })))
+}
+
+/// 从暂停处继续抽取。
+pub async fn resume_extraction(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    Path(id): Path<Uuid>,
+) -> ApiResult<Json<serde_json::Value>> {
+    let doc = utopia_store::documents::get(&state.pool, id).await?;
+    utopia_store::access::require_kb(&state.pool, &user, doc.kb_id, Role::Editor).await?;
+    let job_id = utopia_store::documents::resume_extraction(&state.pool, id).await?;
+    state.emit_document(doc.kb_id, id);
+    Ok(Json(json!({ "ok": true, "job_id": job_id, "graph_status": "queued" })))
+}
+
+/// 停止图谱抽取（保留已抽分块，状态回到 none）。
+pub async fn stop_extraction(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+    Path(id): Path<Uuid>,
+) -> ApiResult<Json<serde_json::Value>> {
+    let doc = utopia_store::documents::get(&state.pool, id).await?;
+    utopia_store::access::require_kb(&state.pool, &user, doc.kb_id, Role::Editor).await?;
+    utopia_store::documents::stop_extraction(&state.pool, id).await?;
+    state.emit_document(doc.kb_id, id);
+    Ok(Json(json!({ "ok": true, "graph_status": "none" })))
 }
 
 fn hex(bytes: &[u8]) -> String {

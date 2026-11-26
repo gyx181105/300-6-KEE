@@ -429,6 +429,18 @@ pub fn router(state: AppState, cfg: &AppConfig) -> Router {
         // 真删（#268 下半）：只对已删除的开放，库管理员
         .route("/documents/{id}/purge", post(documents_routes::purge))
         .route("/documents/{id}/extract", post(graph_routes::extract))
+        .route(
+            "/documents/{id}/extraction/pause",
+            post(documents_routes::pause_extraction),
+        )
+        .route(
+            "/documents/{id}/extraction/resume",
+            post(documents_routes::resume_extraction),
+        )
+        .route(
+            "/documents/{id}/extraction/stop",
+            post(documents_routes::stop_extraction),
+        )
         .route("/kbs/{id}/graph/overview", get(graph_routes::overview))
         .route(
             "/kbs/{id}/graph/neighborhood",

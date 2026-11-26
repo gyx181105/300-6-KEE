@@ -1,5 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { api, type User } from "./api";
+import { api, clearSessionToken, type User } from "./api";
 import { liveAnswer } from "./liveAnswer";
 import { convMarks } from "./unread";
 import { kbStore, wsStore } from "./wsStore";
@@ -61,5 +61,6 @@ export function clearSessionState(queryClient: QueryClient) {
   clearShared();
   sessionStorage.removeItem(OWNER_KEY);
   localStorage.removeItem(OWNER_KEY);
+  clearSessionToken();
   queryClient.clear();
 }

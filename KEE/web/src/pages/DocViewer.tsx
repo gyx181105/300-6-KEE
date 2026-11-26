@@ -4,11 +4,13 @@ import { Link, useNavigate, useParams, useSearch } from "@tanstack/react-router"
 import { api, type ChunkFact, type Doc } from "../api";
 import { S } from "../i18n";
 import { useKbId } from "../kb";
+import { observeDoc } from "../processLog";
 import { originHint, originLabel } from "../origin";
 import { fmtTime } from "../time";
 import { GroupLabel, LinkButton, PageHeader, Pager, pageSlice } from "../ui";
 import { AddOntologyRegressionDialog } from "./AddOntologyRegressionDialog";
 import { QuotedText } from "../ui/citation";
+import { ProcessTimeline } from "./ProcessTimeline";
 import { SourcesRail } from "./SourcesRail";
 
 const DOC_PAGE = 12;
@@ -70,6 +72,11 @@ export function DocViewer() {
     }
   }, [detail.data, chunk]);
 
+  // 详情页自己也喂 processLog，并靠下方 SSE→docDetail 失效跟着走
+  useEffect(() => {
+    if (detail.data?.document) observeDoc(detail.data.document);
+  }, [detail.data?.document]);
+
   if (detail.isPending)
     return <div className="p-8 text-body text-ink-2">{S.doc.loading}</div>;
   if (detail.isError)
@@ -105,6 +112,8 @@ export function DocViewer() {
             </Link>
           }
         />
+
+        <ProcessTimeline doc={doc} />
 
         <div className="space-y-3">
           {pagedChunks.map((c) => {

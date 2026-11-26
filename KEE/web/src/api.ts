@@ -43,14 +43,37 @@ function streamFailure(data: string): string {
   return data;
 }
 
+/** 会话 JWT。正常靠 HttpOnly cookie；部分浏览器/代理下 cookie 落不下时
+ *  （login 200 随后 me 401），用登录响应里的 token 作 Bearer 兜底。 */
+const SESSION_KEY = "utopia.session";
+
+export function setSessionToken(token: string | null) {
+  if (token) sessionStorage.setItem(SESSION_KEY, token);
+  else sessionStorage.removeItem(SESSION_KEY);
+}
+
+export function clearSessionToken() {
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
+function sessionToken(): string | null {
+  return sessionStorage.getItem(SESSION_KEY);
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = sessionToken();
+  const baseHeaders: Record<string, string> =
+    init?.body instanceof FormData
+      ? {}
+      : { "Content-Type": "application/json" };
+  if (token) baseHeaders.Authorization = `Bearer ${token}`;
   const res = await fetch(path, {
     credentials: "include",
-    headers:
-      init?.body instanceof FormData
-        ? {}
-        : { "Content-Type": "application/json" },
     ...init,
+    headers: {
+      ...baseHeaders,
+      ...(init?.headers as Record<string, string> | undefined),
+    },
   });
   if (!res.ok) {
     // 措辞在这一个收口点定：22 个文件里的 toast.error(e.message) 一处都不用改
@@ -195,7 +218,11 @@ export interface Doc {
   error: string | null;
   /** 图谱抽取管道的失败原因（与 error 分列：两条管道各存各的） */
   graph_error: string | null;
+  /** 本轮图谱抽取开始时刻；行内进度用它续算时长。暂停/继续保留 */
+  graph_started_at?: string | null;
   chunk_count: number;
+  /** 已打上 extracted_at 的活分块数；图谱抽取进度的分子。旧响应可能缺省 */
+  extracted_chunks?: number;
   /** 文档标签。**今天没有任何界面用它**——故意留着，理由写在
    *  `migrations/0002_ingest.sql` 的 `tags` 列上 */
   tags: string[];
@@ -1700,18 +1727,34 @@ export const api = {
     }),
   alertsReadAll: () =>
     request<{ ok: boolean }>("/api/v1/alerts/read-all", { method: "POST" }),
-  login: (email: string, password: string) =>
-    request<{ user: User }>("/api/v1/auth/login", {
+  login: async (email: string, password: string) => {
+    const out = await request<{ user: User; token: string }>("/api/v1/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
-    }),
-  register: (email: string, password: string, displayName: string) =>
-    request<{ user: User; workspace: Workspace }>("/api/v1/auth/register", {
-      method: "POST",
-      body: JSON.stringify({ email, password, display_name: displayName }),
-    }),
-  logout: () =>
-    request<{ ok: boolean }>("/api/v1/auth/logout", { method: "POST" }),
+    });
+    if (out.token) setSessionToken(out.token);
+    return out;
+  },
+  register: async (email: string, password: string, displayName: string) => {
+    const out = await request<{ user: User; workspace: Workspace; token: string }>(
+      "/api/v1/auth/register",
+      {
+        method: "POST",
+        body: JSON.stringify({ email, password, display_name: displayName }),
+      },
+    );
+    if (out.token) setSessionToken(out.token);
+    return out;
+  },
+  logout: async () => {
+    try {
+      return await request<{ ok: boolean }>("/api/v1/auth/logout", {
+        method: "POST",
+      });
+    } finally {
+      clearSessionToken();
+    }
+  },
   updateMe: (displayName: string) =>
     request<User>("/api/v1/auth/me", {
       method: "PATCH",
@@ -2277,6 +2320,21 @@ export const api = {
     request<{ job_id: number }>(`/api/v1/documents/${id}/reprocess`, {
       method: "POST",
     }),
+  pauseExtraction: (id: string) =>
+    request<{ ok: boolean; graph_status: string }>(
+      `/api/v1/documents/${id}/extraction/pause`,
+      { method: "POST" },
+    ),
+  resumeExtraction: (id: string) =>
+    request<{ ok: boolean; job_id: number; graph_status: string }>(
+      `/api/v1/documents/${id}/extraction/resume`,
+      { method: "POST" },
+    ),
+  stopExtraction: (id: string) =>
+    request<{ ok: boolean; graph_status: string }>(
+      `/api/v1/documents/${id}/extraction/stop`,
+      { method: "POST" },
+    ),
   /** 来源级全量重抽（增量语义：既有决策保留） */
   reExtractSource: (kbId: string, sourceId: string) =>
     request<{ queued: number }>(

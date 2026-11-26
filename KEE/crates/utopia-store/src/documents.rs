@@ -2,7 +2,8 @@ use chrono::{DateTime, Utc};
 use pgvector::Vector;
 use serde::Serialize;
 use sqlx::{PgPool, Postgres, Transaction};
-use utopia_core::models::{ChunkView, Document, DocumentPage, SourcedChunk};
+use std::collections::HashMap;
+use utopia_core::models::{ChunkView, Document, DocumentListItem, DocumentPage, SourcedChunk};
 use utopia_core::{AppError, AppResult};
 use utopia_ingest::ChunkPiece;
 use uuid::Uuid;
@@ -582,6 +583,16 @@ pub async fn page(
     .fetch_one(pool)
     .await?;
 
+    let ids: Vec<Uuid> = docs.iter().map(|d| d.id).collect();
+    let extracted = extracted_chunk_counts(pool, &ids).await?;
+    let docs = docs
+        .into_iter()
+        .map(|document| DocumentListItem {
+            extracted_chunks: extracted.get(&document.id).copied().unwrap_or(0),
+            document,
+        })
+        .collect();
+
     Ok(DocumentPage {
         docs,
         total,
@@ -591,6 +602,40 @@ pub async fn page(
         failed: stats.3,
         deleted: deleted_total,
     })
+}
+
+/// 各文档已抽取的活分块数（`extracted_at` 非空）。给文库进度条用。
+pub async fn extracted_chunk_counts(
+    pool: &PgPool,
+    ids: &[Uuid],
+) -> AppResult<HashMap<Uuid, i64>> {
+    if ids.is_empty() {
+        return Ok(HashMap::new());
+    }
+    let rows: Vec<(Uuid, i64)> = sqlx::query_as(
+        "SELECT document_id, count(*)::bigint
+           FROM chunks
+          WHERE document_id = ANY($1)
+            AND superseded_at IS NULL
+            AND extracted_at IS NOT NULL
+          GROUP BY document_id",
+    )
+    .bind(ids)
+    .fetch_all(pool)
+    .await?;
+    Ok(rows.into_iter().collect())
+}
+
+/// 一篇文档已抽取的活分块数。
+pub async fn extracted_chunk_count(pool: &PgPool, document_id: Uuid) -> AppResult<i64> {
+    let (n,): (i64,) = sqlx::query_as(
+        "SELECT count(*)::bigint FROM chunks
+          WHERE document_id = $1 AND superseded_at IS NULL AND extracted_at IS NOT NULL",
+    )
+    .bind(document_id)
+    .fetch_one(pool)
+    .await?;
+    Ok(n)
 }
 
 /// 这个来源（或整库）里抽取失败的文档 id。**一键重试要的就是这份名单**。
@@ -1748,6 +1793,129 @@ pub async fn queue_extraction_one(pool: &PgPool, document_id: Uuid) -> AppResult
     .await?;
     sqlx::query(
         "UPDATE documents SET graph_status = 'queued', graph_error = NULL,
+                extract_epoch = extract_epoch + 1,
+                graph_started_at = now()
+         WHERE id = $1",
+    )
+    .bind(document_id)
+    .execute(&mut *tx)
+    .await?;
+    let (job_id,): (i64,) = sqlx::query_as(
+        "INSERT INTO jobs (kind, payload)
+         VALUES ('extract_document', jsonb_build_object('document_id', $1::text))
+         RETURNING id",
+    )
+    .bind(document_id)
+    .fetch_one(&mut *tx)
+    .await?;
+    crate::jobs::notify_worker_tx(&mut tx).await?;
+    tx.commit().await?;
+    Ok(job_id)
+}
+
+/// 打断正在抽或已排队的抽取任务：抬 epoch，删掉未开跑的任务。
+async fn interrupt_extraction_tx(
+    tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    document_id: Uuid,
+) -> AppResult<()> {
+    sqlx::query(
+        "DELETE FROM jobs WHERE kind = 'extract_document' AND status = 'queued'
+           AND payload->>'document_id' = $1",
+    )
+    .bind(document_id.to_string())
+    .execute(&mut **tx)
+    .await?;
+    sqlx::query(
+        "UPDATE documents SET extract_epoch = extract_epoch + 1 WHERE id = $1",
+    )
+    .bind(document_id)
+    .execute(&mut **tx)
+    .await?;
+    Ok(())
+}
+
+/// 暂停图谱抽取：保留已抽分块，状态改为 `paused`。只能从 queued / extracting 进来。
+pub async fn pause_extraction(pool: &PgPool, document_id: Uuid) -> AppResult<()> {
+    let mut tx = pool.begin().await?;
+    let status: Option<String> = sqlx::query_scalar(
+        "SELECT graph_status FROM documents WHERE id = $1 FOR UPDATE",
+    )
+    .bind(document_id)
+    .fetch_optional(&mut *tx)
+    .await?;
+    let Some(status) = status else {
+        return Err(AppError::NotFound);
+    };
+    if status != "queued" && status != "extracting" {
+        return Err(AppError::Validation(
+            "Only a queued or extracting document can be paused".into(),
+        ));
+    }
+    interrupt_extraction_tx(&mut tx, document_id).await?;
+    sqlx::query("UPDATE documents SET graph_status = 'paused', graph_error = NULL WHERE id = $1")
+        .bind(document_id)
+        .execute(&mut *tx)
+        .await?;
+    tx.commit().await?;
+    Ok(())
+}
+
+/// 停止图谱抽取：保留已抽分块，状态回到 `none`（可再点抽取）。
+pub async fn stop_extraction(pool: &PgPool, document_id: Uuid) -> AppResult<()> {
+    let mut tx = pool.begin().await?;
+    let status: Option<String> = sqlx::query_scalar(
+        "SELECT graph_status FROM documents WHERE id = $1 FOR UPDATE",
+    )
+    .bind(document_id)
+    .fetch_optional(&mut *tx)
+    .await?;
+    let Some(status) = status else {
+        return Err(AppError::NotFound);
+    };
+    if !matches!(status.as_str(), "queued" | "extracting" | "paused") {
+        return Err(AppError::Validation(
+            "Only a queued, extracting or paused document can be stopped".into(),
+        ));
+    }
+    interrupt_extraction_tx(&mut tx, document_id).await?;
+    sqlx::query(
+        "UPDATE documents SET graph_status = 'none', graph_error = NULL,
+                graph_started_at = NULL WHERE id = $1",
+    )
+    .bind(document_id)
+    .execute(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    Ok(())
+}
+
+/// 从暂停处继续：不清 `extracted_at`，只重新排队。
+pub async fn resume_extraction(pool: &PgPool, document_id: Uuid) -> AppResult<i64> {
+    let mut tx = pool.begin().await?;
+    let status: Option<String> = sqlx::query_scalar(
+        "SELECT graph_status FROM documents WHERE id = $1 FOR UPDATE",
+    )
+    .bind(document_id)
+    .fetch_optional(&mut *tx)
+    .await?;
+    let Some(status) = status else {
+        return Err(AppError::NotFound);
+    };
+    if status != "paused" {
+        return Err(AppError::Validation(
+            "Only a paused document can be resumed".into(),
+        ));
+    }
+    sqlx::query(
+        "DELETE FROM jobs WHERE kind = 'extract_document' AND status = 'queued'
+           AND payload->>'document_id' = $1",
+    )
+    .bind(document_id.to_string())
+    .execute(&mut *tx)
+    .await?;
+    // 继续：保留 graph_started_at，时长从本轮第一次入队算起
+    sqlx::query(
+        "UPDATE documents SET graph_status = 'queued', graph_error = NULL,
                 extract_epoch = extract_epoch + 1
          WHERE id = $1",
     )
@@ -2072,7 +2240,8 @@ pub async fn queue_extraction(
     .await?;
     sqlx::query(
         "UPDATE documents SET graph_status = 'queued', graph_error = NULL,
-                extract_epoch = extract_epoch + 1
+                extract_epoch = extract_epoch + 1,
+                graph_started_at = now()
          WHERE id = ANY($1)",
     )
     .bind(&ids)

@@ -918,9 +918,11 @@ const PRESETS: Record<
     embedModel: "text-embedding-v3",
   },
   Ollama: {
-    chat: "http://localhost:11434/v1",
-    chatModel: "qwen2.5:7b",
-    embed: "http://localhost:11434/v1",
+    // 用 127.0.0.1 而不是 localhost：Ollama 默认只绑 IPv4，
+    // macOS 上 localhost 常先走 ::1，探测会报 error sending request
+    chat: "http://127.0.0.1:11434/v1",
+    chatModel: "qwen2.5:7b-instruct",
+    embed: "http://127.0.0.1:11434/v1",
     embedModel: "bge-m3",
   },
   OpenAI: {
@@ -1285,7 +1287,7 @@ function WorkspaceSettings({ workspaceId, tab }: { workspaceId: string; tab: str
                   <label className={label}>{S.settings.baseUrl}</label>
                   <Input
                     className="w-full"
-                    placeholder="http://localhost:11434/v1"
+                    placeholder="http://127.0.0.1:11434/v1"
                     value={form.embed_base_url}
                     onChange={set("embed", "embed_base_url")}
                   />

@@ -1,3 +1,4 @@
+import { ComponentLab } from "./pages/ComponentLab";
 import { ExpressionDraftLab } from "./pages/ExpressionDraftLab";
 import { docSearch } from "./quotes";
 import {
@@ -138,6 +139,13 @@ const expressionDraftRoute = createRoute({
   getParentRoute: () => kbRoute,
   path: "expression-draft",
   component: ExpressionDraftLab,
+});
+
+/** 通用组件实验室：定稿前的预览页，不挂主导航 */
+const designLabRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dev/Design",
+  component: ComponentLab,
 });
 
 const ontologyRoute = createRoute({
@@ -295,6 +303,7 @@ const routeTree = rootRoute.addChildren([
   privacyRoute,
   termsRoute,
   settingsRoute,
+  designLabRoute,
   docsIndexRoute,
   docsRoute,
   accountShellRoute.addChildren([accountRoute, myKbsRoute, tokensRoute, adminRoute]),
