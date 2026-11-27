@@ -387,6 +387,10 @@ pub fn router(state: AppState, cfg: &AppConfig) -> Router {
         )
         .route("/kbs/{id}/ontology/propose", post(question_routes::propose))
         .route(
+            "/kbs/{id}/ontology/propose/status",
+            get(question_routes::propose_status),
+        )
+        .route(
             "/kbs/{id}/ontology/proposals/adopt",
             post(question_routes::adopt),
         )

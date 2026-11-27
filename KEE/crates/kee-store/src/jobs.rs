@@ -140,6 +140,26 @@ pub async fn pending_for_kb(pool: &PgPool, kind: &str, kb_id: Uuid) -> AppResult
     .await?)
 }
 
+/// 这个库上这一种任务里最新的一条排着或跑着的（按 id）。界面点「请代理提案」后
+/// 要跟着看进度：入队撞上已有任务时返回那条的 id，而不是只说「没排上」
+pub async fn latest_pending_for_kb(
+    pool: &PgPool,
+    kind: &str,
+    kb_id: Uuid,
+) -> AppResult<Option<i64>> {
+    Ok(sqlx::query_scalar(
+        "SELECT id FROM jobs
+          WHERE kind = $1 AND status IN ('queued', 'running')
+            AND payload->>'kb_id' = $2
+          ORDER BY id DESC
+          LIMIT 1",
+    )
+    .bind(kind)
+    .bind(kb_id.to_string())
+    .fetch_optional(pool)
+    .await?)
+}
+
 pub async fn enqueue(pool: &PgPool, kind: &str, payload: serde_json::Value) -> AppResult<i64> {
     enqueue_with_max_attempts(pool, kind, payload, 3).await
 }

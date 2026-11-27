@@ -1710,6 +1710,28 @@ export const zh: Strings = {
       "从本体还没覆盖的短语和类别词里提出该建的类与属性，对着能力问题判断。",
     agentQueued: "代理在看——看完了提案会出现在这里。",
     agentWaiting: "代理在看…",
+    agentStatusQueued: "已排队，等待开始…",
+    agentStatusRunning: "代理正在读文档里的说法并写提案…",
+    agentStatusDone: "代理看完了",
+    agentStatusFailed: "代理这次没跑完",
+    agentElapsed: (s: number) =>
+      s < 60 ? `已用时 ${s} 秒` : `已用时 ${Math.floor(s / 60)} 分 ${s % 60} 秒`,
+    agentProgressHint:
+      "一轮大约要看几十到上百条未匹配说法，通常一两分钟；提案出来后仍需你点加入。",
+    adoptAll: "全部加入",
+    adoptAllHint:
+      "按依赖顺序批量采纳：先映射与类（父类优先），再属性与关系；缺的端点会跳过，避免父类不存在时报错。",
+    adoptAllRunning: (done: number, total: number, label: string) =>
+      `正在加入 ${done}/${total} · ${label}`,
+    adoptAllDone: (ok: number, fail: number) =>
+      fail > 0 ? `已加入 ${ok} 条，${fail} 条未成功` : `已加入 ${ok} 条`,
+    adoptAllEmpty: "没有可加入的提案。",
+    adoptAllConfirm: (n: number) =>
+      `将按依赖顺序加入全部 ${n} 条提案。缺的父类/端点会自动略过。继续？`,
+    rejectAll: "全部拒绝",
+    rejectAllHint: "把当前列表里还未表态的提案全部标为拒绝；可填一句理由给下一轮代理看。",
+    rejectAllConfirm: (n: number) => `拒绝全部 ${n} 条提案？`,
+    rejectAllDone: (n: number) => `已拒绝 ${n} 条`,
     agentChip: "代理",
     servesQuestions: (n: number) => `服务 ${n} 个问题`,
     bindsShapes: (n: number) => `会绑 ${n} 种短语形状`,

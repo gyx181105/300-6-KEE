@@ -1943,6 +1943,29 @@ export const en = {
       "Proposes classes and properties from phrases and kind words the ontology does not cover yet, judged against the competency questions.",
     agentQueued: "The agent is looking — proposals appear here when it is done.",
     agentWaiting: "Agent working…",
+    agentStatusQueued: "Queued, waiting to start…",
+    agentStatusRunning: "The agent is reading unbound phrases and drafting proposals…",
+    agentStatusDone: "The agent finished",
+    agentStatusFailed: "The agent did not finish this run",
+    agentElapsed: (s: number) =>
+      s < 60 ? `${s}s elapsed` : `${Math.floor(s / 60)}m ${s % 60}s elapsed`,
+    agentProgressHint:
+      "A round looks at dozens to a hundred unbound shapes and often takes a minute or two; you still approve each proposal.",
+    adoptAll: "Add all",
+    adoptAllHint:
+      "Adopts every open proposal in dependency order: mappings and classes (parents first), then attributes and relations. Missing endpoints are skipped so a missing parent does not block the batch.",
+    adoptAllRunning: (done: number, total: number, label: string) =>
+      `Adding ${done}/${total} · ${label}`,
+    adoptAllDone: (ok: number, fail: number) =>
+      fail > 0 ? `Added ${ok}, ${fail} failed` : `Added ${ok}`,
+    adoptAllEmpty: "Nothing to add.",
+    adoptAllConfirm: (n: number) =>
+      `Add all ${n} proposals in dependency order? Missing parents or endpoints will be skipped.`,
+    rejectAll: "Reject all",
+    rejectAllHint:
+      "Reject every open proposal in this list; an optional reason is kept for the next agent round.",
+    rejectAllConfirm: (n: number) => `Reject all ${n} proposals?`,
+    rejectAllDone: (n: number) => (n === 1 ? "Rejected 1" : `Rejected ${n}`),
     agentChip: "agent",
     servesQuestions: (n: number) =>
       n === 1 ? "serves 1 question" : `serves ${n} questions`,
