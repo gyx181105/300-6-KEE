@@ -2399,12 +2399,30 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ section, key, status, reason }),
     }),
-  /** 叫本体代理来看一眼（0061 决定 2）：排一份任务，结果落在 storedProposals */
+  /** 叫本体代理来看一眼（0061 决定 2）：排一份任务，结果落在 storedProposals。
+   *  `job_id` 有则用来轮询进度（排队 / 在跑 / 失败）；已有任务在跑时仍带回那条 id */
   proposeOntology: (kbId: string) =>
-    request<{ queued: boolean }>(`/api/v1/kbs/${kbId}/ontology/propose`, {
-      method: "POST",
-      body: "{}",
-    }),
+    request<{ queued: boolean; job_id?: number | null }>(
+      `/api/v1/kbs/${kbId}/ontology/propose`,
+      {
+        method: "POST",
+        body: "{}",
+      },
+    ),
+  /** 一个任务此刻的样子（0051）：Viewer 可读，且必须属于这个库 */
+  jobInKb: (kbId: string, jobId: number) =>
+    request<{
+      job: {
+        id: number;
+        kind: string;
+        status: string;
+        attempts: number;
+        max_attempts: number;
+        last_error: string | null;
+        run_at: string;
+        updated_at: string;
+      };
+    }>(`/api/v1/kbs/${kbId}/jobs/${jobId}`),
   /** 采纳代理的一条提案（0061 决定 3）：元素、回归用例、采纳的状态和后续任务一次提交 */
   adoptProposal: (
     kbId: string,

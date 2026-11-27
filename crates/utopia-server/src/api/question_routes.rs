@@ -223,7 +223,8 @@ pub struct ProposeReq {
     pub glossary: Option<String>,
 }
 
-/// 叫代理来看一眼：排一份任务，马上回。结果落在 `ontology_proposals`，界面从那里读
+/// 叫代理来看一眼：排一份任务，马上回。结果落在 `ontology_proposals`，界面从那里读。
+/// 带回 `job_id`，好让界面跟着看排队 / 在跑 / 失败，而不是只干等提案条数变多
 pub async fn propose(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
@@ -238,7 +239,14 @@ pub async fn propose(
     };
     let queued =
         utopia_store::jobs::enqueue_unless_queued(&state.pool, "propose_ontology", payload).await?;
-    Ok(Json(json!({ "queued": queued.is_some() })))
+    let job_id = match queued {
+        Some(id) => Some(id),
+        None => {
+            utopia_store::jobs::latest_pending_for_kb(&state.pool, "propose_ontology", kb_id)
+                .await?
+        }
+    };
+    Ok(Json(json!({ "queued": queued.is_some(), "job_id": job_id })))
 }
 
 #[derive(Deserialize)]

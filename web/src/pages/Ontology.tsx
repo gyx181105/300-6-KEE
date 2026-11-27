@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import {
   api,
+  ApiError,
   type EntityTypeView,
   type ImportPlan,
   type OntologyImportView,
@@ -51,6 +52,11 @@ import {
   ConnectDialog,
   PropertyDialog,
 } from "./ontologyDialogs";
+import {
+  editsForItem,
+  flattenBatchOrder,
+  type BatchSection,
+} from "./ontologyProposalBatch";
 import {
   Button,
   Chip,
@@ -541,6 +547,7 @@ export function Ontology() {
               <div>
                 <MissesPanel
                   kbId={kb.id}
+                  existingClassKeys={entity_types.map((t) => t.key)}
                   onChanged={refresh}
                   onError={onError}
                 />
@@ -2109,10 +2116,13 @@ function QuestionsPanel({
 
 function MissesPanel({
   kbId,
+  existingClassKeys,
   onChanged,
   onError,
 }: {
   kbId: string;
+  /** 库里已有的类 key：批量加入时用来裁掉还不存在的父类 / 端点 */
+  existingClassKeys: string[];
   onChanged: () => void;
   onError: (e: unknown) => void;
 }) {
@@ -2122,11 +2132,19 @@ function MissesPanel({
     queryFn: () => api.questionReport(kbId),
   }).data?.uncovered;
   const [proposals, setProposals] = useState<OntologyProposals | null>(null);
-  // 叫了代理之后等它：任务在后台跑，隔几秒看一眼库里有没有新提案（0061）。
-  // 记的是叫它那一刻提案的条数——多出来了就是它答完了；两分钟没动静就不等了
+  // 叫了代理之后跟任务走：有 job_id 就轮询状态；没有则退回「提案条数变多 / 两分钟超时」
   const [awaitingAgent, setAwaitingAgent] = useState<{
     since: number;
     had: number;
+    jobId: number | null;
+  } | null>(null);
+  const [agentJobStatus, setAgentJobStatus] = useState<string | null>(null);
+  const [agentJobError, setAgentJobError] = useState<string | null>(null);
+  const [elapsedSec, setElapsedSec] = useState(0);
+  const [batch, setBatch] = useState<{
+    done: number;
+    total: number;
+    label: string;
   } | null>(null);
   // 还没人表态的提案存在库里（0049）：刷新页面、切走再回来都从这里捞
   const storedProposals = useQuery({
@@ -2134,17 +2152,58 @@ function MissesPanel({
     queryFn: () => api.storedProposals(kbId),
     refetchInterval: awaitingAgent ? 4000 : false,
   });
+  const agentJob = useQuery({
+    queryKey: ["proposeOntologyJob", kbId, awaitingAgent?.jobId],
+    queryFn: () => api.jobInKb(kbId, awaitingAgent!.jobId!),
+    enabled: !!awaitingAgent?.jobId,
+    refetchInterval: awaitingAgent?.jobId ? 2000 : false,
+  });
+
   useEffect(() => {
-    if (!awaitingAgent || !storedProposals.data) return;
+    if (!awaitingAgent) {
+      setElapsedSec(0);
+      return;
+    }
+    const tick = () =>
+      setElapsedSec(Math.max(0, Math.floor((Date.now() - awaitingAgent.since) / 1000)));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [awaitingAgent]);
+
+  useEffect(() => {
+    if (!awaitingAgent) return;
+    const job = agentJob.data?.job;
+    if (job) {
+      setAgentJobStatus(job.status);
+      if (job.status === "failed") {
+        setAgentJobError(job.last_error);
+        setAwaitingAgent(null);
+        toast.error(job.last_error || S.ontology.agentStatusFailed);
+        return;
+      }
+      if (job.status === "done") {
+        void api.storedProposals(kbId).then((d) => {
+          setProposals(d);
+          setAwaitingAgent(null);
+          setAgentJobStatus("done");
+          toast.success(S.ontology.agentStatusDone);
+        });
+        return;
+      }
+    }
+    // 没有 job 可跟，或任务还在跑：提案条数涨了也算完；五分钟仍无结果就停
     const d = storedProposals.data;
     if (
-      proposalCount(d) > awaitingAgent.had ||
-      Date.now() - awaitingAgent.since > 120_000
+      d &&
+      (proposalCount(d) > awaitingAgent.had ||
+        Date.now() - awaitingAgent.since > 300_000)
     ) {
       setProposals(d);
       setAwaitingAgent(null);
     }
-  }, [awaitingAgent, storedProposals.data]);
+  }, [awaitingAgent, agentJob.data, storedProposals.data, kbId]);
+
   useEffect(() => {
     // 只在还没有本地结果时回填：刚表过态的那一批不该被库里的旧快照盖回去
     if (proposals === null && storedProposals.data) {
@@ -2154,16 +2213,19 @@ function MissesPanel({
 
   const askAgent = useMutation({
     mutationFn: () => api.proposeOntology(kbId),
-    onSuccess: () => {
+    onSuccess: (res) => {
       toast.info(S.ontology.agentQueued);
+      setAgentJobError(null);
+      setAgentJobStatus(res.job_id ? "queued" : null);
       setAwaitingAgent({
         since: Date.now(),
         had: proposalCount(storedProposals.data ?? proposals),
+        jobId: res.job_id ?? null,
       });
     },
     onError,
   });
-  type Section = "map_to" | "entity_types" | "relation_types" | "attribute_types";
+  type Section = BatchSection;
   const drop = (section: Section, key: string) =>
     setProposals(
       (prev) =>
@@ -2193,10 +2255,21 @@ function MissesPanel({
     const reason = window.prompt(S.ontology.rejectReasonPrompt) ?? "";
     rejectProposal.mutate({ section, key, reason: reason.trim() || undefined });
   };
-  // 采纳走服务端一个端点：建类或属性（或写下人的绑定）、标记提案、排对齐（0061 决定 3）
+  // 采纳走服务端一个端点：建类或属性（或写下人的绑定）、标记提案、排对齐（0061 决定 3）。
+  // 父类 / 端点若还不在库里，先从 edits 里摘掉——否则 `class '…' does not exist` 拦死单条加入
   const adopt = useMutation({
-    mutationFn: ({ section, key }: { section: Section; key: string }) =>
-      api.adoptProposal(kbId, section, key),
+    mutationFn: ({ section, key }: { section: Section; key: string }) => {
+      const known = new Set(existingClassKeys);
+      const item = proposals
+        ? flattenBatchOrder(proposals).find((p) => p.section === section && p.key === key)
+        : undefined;
+      return api.adoptProposal(
+        kbId,
+        section,
+        key,
+        item ? editsForItem(item, known) : undefined,
+      );
+    },
     onSuccess: (d, v) => {
       // 复用时有人在代理读过之后另定了的，照人的留着没写：说一声，不然卡片一走像是全写了
       if (d.skipped.length > 0) toast.info(S.ontology.adoptKept(d.skipped.length));
@@ -2206,6 +2279,71 @@ function MissesPanel({
     },
     onError,
   });
+
+  const adoptAll = useMutation({
+    mutationFn: async () => {
+      if (!proposals) return { ok: 0, fail: 0 };
+      const items = flattenBatchOrder(proposals);
+      if (items.length === 0) return { ok: 0, fail: 0 };
+      const known = new Set(existingClassKeys);
+      let ok = 0;
+      let fail = 0;
+      setBatch({ done: 0, total: items.length, label: items[0]?.label ?? "" });
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]!;
+        setBatch({ done: i, total: items.length, label: item.label || item.key });
+        const edits = editsForItem(item, known);
+        try {
+          await api.adoptProposal(kbId, item.section, item.key, edits);
+          drop(item.section, item.key);
+          if (item.section === "entity_types") known.add(item.key);
+          ok += 1;
+        } catch (e) {
+          fail += 1;
+          // 忙就稍等再试一次；其它错误记一笔继续下一条，不让一批死在中间
+          const busy =
+            e instanceof ApiError &&
+            (e.code === "alignment_busy" || /busy|try again/i.test(e.message));
+          if (busy) {
+            await new Promise((r) => setTimeout(r, 800));
+            try {
+              await api.adoptProposal(kbId, item.section, item.key, edits);
+              drop(item.section, item.key);
+              if (item.section === "entity_types") known.add(item.key);
+              ok += 1;
+              fail -= 1;
+            } catch {
+              /* 第二次仍失败就算了 */
+            }
+          }
+        }
+      }
+      setBatch(null);
+      return { ok, fail };
+    },
+    onSuccess: (r) => {
+      if (r.ok + r.fail === 0) {
+        toast.info(S.ontology.adoptAllEmpty);
+        return;
+      }
+      toast.success(S.ontology.adoptAllDone(r.ok, r.fail));
+      onChanged();
+      void api.storedProposals(kbId).then(setProposals);
+    },
+    onError: (e) => {
+      setBatch(null);
+      onError(e);
+    },
+  });
+
+  const openCount = proposalCount(proposals);
+  const busy =
+    askAgent.isPending ||
+    awaitingAgent !== null ||
+    adopt.isPending ||
+    adoptAll.isPending ||
+    batch !== null;
+
   const actions = (section: Section, key: string, label: string) => (
     <>
       <Button
@@ -2213,7 +2351,7 @@ function MissesPanel({
         size="sm"
         className="ml-auto"
         onClick={() => adopt.mutate({ section, key })}
-        disabled={adopt.isPending}
+        disabled={busy}
       >
         {label}
       </Button>
@@ -2221,12 +2359,29 @@ function MissesPanel({
         size="sm"
         variant="secondary"
         onClick={() => reject(section, key)}
-        disabled={rejectProposal.isPending}
+        disabled={busy || rejectProposal.isPending}
       >
         {S.ontology.rejectProposal}
       </Button>
     </>
   );
+
+  const agentStatusLabel =
+    agentJobStatus === "running"
+      ? S.ontology.agentStatusRunning
+      : agentJobStatus === "queued"
+        ? S.ontology.agentStatusQueued
+        : agentJobStatus === "failed"
+          ? S.ontology.agentStatusFailed
+          : S.ontology.agentWaiting;
+  const progressWidth =
+    agentJobStatus === "done"
+      ? "100%"
+      : agentJobStatus === "running"
+        ? "66%"
+        : agentJobStatus === "queued"
+          ? "28%"
+          : "40%";
 
   return (
     // 整页视图不再套一层卡片：标题是页标题，正文平铺（与 Refine / Rules 同一副样子）
@@ -2235,15 +2390,31 @@ function MissesPanel({
         title={S.ontology.misses}
         sub={S.ontology.missesHint}
         actions={
-          <Button
-            size="sm"
-            variant="secondary"
-            title={S.ontology.askAgentHint}
-            onClick={() => askAgent.mutate()}
-            disabled={askAgent.isPending || awaitingAgent !== null}
-          >
-            {awaitingAgent ? S.ontology.agentWaiting : S.ontology.askAgent}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {openCount > 0 && (
+              <Button
+                size="sm"
+                variant="primary"
+                title={S.ontology.adoptAllHint}
+                disabled={busy}
+                onClick={() => {
+                  if (!window.confirm(S.ontology.adoptAllConfirm(openCount))) return;
+                  adoptAll.mutate();
+                }}
+              >
+                {S.ontology.adoptAll}
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="secondary"
+              title={S.ontology.askAgentHint}
+              onClick={() => askAgent.mutate()}
+              disabled={askAgent.isPending || awaitingAgent !== null || adoptAll.isPending}
+            >
+              {awaitingAgent ? S.ontology.agentWaiting : S.ontology.askAgent}
+            </Button>
+          </div>
         }
       />
 
@@ -2255,6 +2426,49 @@ function MissesPanel({
             : S.ontology.noMisses}
         </p>
       )}
+
+      {awaitingAgent && (
+        <div className="mt-3 rounded-panel border border-line bg-surface px-3 py-3">
+          <div className="flex items-center gap-2 text-body">
+            <Spinner size={16} label={agentStatusLabel} />
+            <span className="min-w-0 flex-1 truncate">{agentStatusLabel}</span>
+            <span className="shrink-0 text-small text-ink-2">
+              {S.ontology.agentElapsed(elapsedSec)}
+            </span>
+          </div>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line">
+            <div
+              className="h-full rounded-full bg-accent transition-[width] duration-500"
+              style={{ width: progressWidth }}
+            />
+          </div>
+          <p className="mt-2 text-small text-ink-2">{S.ontology.agentProgressHint}</p>
+        </div>
+      )}
+
+      {agentJobError && !awaitingAgent && (
+        <p className="mt-3 text-body text-danger">{agentJobError}</p>
+      )}
+
+      {batch && (
+        <div className="mt-3 rounded-panel border border-line bg-surface px-3 py-3">
+          <div className="flex items-center gap-2 text-body">
+            <Spinner size={16} />
+            <span className="min-w-0 flex-1 truncate">
+              {S.ontology.adoptAllRunning(batch.done, batch.total, batch.label)}
+            </span>
+          </div>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line">
+            <div
+              className="h-full rounded-full bg-accent transition-[width] duration-300"
+              style={{
+                width: `${batch.total ? Math.round((batch.done / batch.total) * 100) : 0}%`,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {proposals && (
         <div className="mt-4 border-t border-line pt-3">
           <h4 className="mb-2 text-small font-semibold text-ink-2">
